@@ -54,7 +54,7 @@
 ### Updating
 #### /api/update/:id (GET)
 - Success: 200 OK
-    - Body contains {factions:[], new_friends:[], pending_requests:[]}
+    - Body contains {factions:[], new_friends:[], pending_requests:[], responses[{faction_id, response}]}
     - factions: Empty list if no new factions, otherwise IDs of new factions
     - new_friends: Empty list if no new friends (i.e. pending friend requests that have been approved), otherwise, list of usernames with approved friends
     - pending_requests: Empty list if no new pending requests, otherwise, list contains usernames of people who requested to be this person's friend
@@ -81,3 +81,13 @@
 - Error: 404 Not Found
     - Body contains {error:""}
     - Error may be invalid id or invalid faction_id
+
+### Responding to a Friend Request
+#### /api/users/accept_friend:id (POST)
+- JSON object {username, accepted}
+    - Friend contains username of person accepting
+    - Will accept if accepted is "true", assumed false otherwise
+- Success: 200 OK
+- Error: 404 Not Found
+    - Body contains {error:""}
+    - Error may be invalid id or invalid username
