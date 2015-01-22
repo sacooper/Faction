@@ -37,6 +37,11 @@ module.exports.routes = {
   'get /api/auth/:provider/callback': 'AuthController.callback',
   'get /api/auth/:provider/:action' : 'AuthController.callback',
 
+
+  /** Faction sending/recieving **/
+  'post /api/factions/send'         : 'FactionController.create',
+
+
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
@@ -50,6 +55,8 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
+
+
 
   /***************************************************************************
   *                                                                          *

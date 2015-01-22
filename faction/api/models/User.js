@@ -9,6 +9,9 @@ var User = {
     	collection: 'faction',
         via: 'sender'
     },
+    pendingFactions : {
+        collection: 'faction'
+    },
     pendingTo : {
     	collection: 'user'
     },
