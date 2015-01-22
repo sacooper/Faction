@@ -47,11 +47,14 @@ exports.register = function (req, res, next) {
   , email    : email
   }, function (err, user) {
     if (err) {
+      sails.log(err.code);
       if (err.code === 'E_VALIDATION') {
         if (err.invalidAttributes.email) {
-          req.flash('error', 'Error.Passport.Email.Exists');
+          return res.json({error: "Email already exists"});
+        } else if(err.invalidAttributes.username) {
+          return res.json({error: "Username already exists"});
         } else {
-          req.flash('error', 'Error.Passport.User.Exists');
+          return res.status(500).send('');
         }
       }
 
