@@ -49,3 +49,5 @@ npm-debug.log
 # sftp configuration file
 sftp-config.json
 
+# ignore database passwords
+connections.js
