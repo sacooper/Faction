@@ -1,3 +1,5 @@
+var bcrypt = require('bcryptjs');
+
 /**
  * Authentication Controller
  *
@@ -93,6 +95,53 @@ var AuthController = {
     });
   },
 
+
+  updatepassword: function (req, res){
+    var update = function(err, valid){
+      if (!err){
+        if (valid){
+            bcrypt.hash(req.param('new'), 10, function (err, hash) {
+              if (!err){
+                Passport.update({user:req.user.id, protocol:'local'}, {password:hash});
+                res.json({});
+              }
+              else
+                sails.log(err);
+            });
+        } else {
+          sails.log("Invalid old password");
+        }
+      } else {
+        sails.log("Error: " + err);
+      }
+    };
+
+
+    var old = req.param('old');
+
+    Passport.findOne()
+      .where({user:req.user.id, protocol: 'local'})
+      .then(function(passport){
+        passport.validatePassword(old, update)})
+
+
+    
+    // User.findOne().where({id:req.user.id})
+    //   .populate("passports")
+    //   .then(function(user){
+    //     Passport.update({user.passports.id})
+    //   })
+      // .then(function(user){
+      //   sails.log(user);
+      // });
+    // User.update({id:req.user.id}, {})
+    //   .then(function(user){
+    //     sails.log(user);
+    //     return res.json({});
+    //   });
+
+  },
+
   /**
    * Create a third-party authentication endpoint
    *
@@ -161,10 +210,6 @@ var AuthController = {
           return tryAgain();
         }
 
-        // Upon successful login, send the user to the homepage were req.user
-        // will available.
-        console.log('req.user', req.user);
-        console.log('req.session', req.session);
         res.redirect('/');
       });
     });
