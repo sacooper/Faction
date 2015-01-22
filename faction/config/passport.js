@@ -17,7 +17,8 @@
 module.exports.passport = {
   local: {
     strategy: require('passport-local').Strategy
-  },
+  }
+  // ,
 
   // twitter: {
   //   name: 'Twitter',
@@ -39,15 +40,15 @@ module.exports.passport = {
   //   }
   // },
 
-  facebook: {
-    name: 'Facebook',
-    protocol: 'oauth2',
-    strategy: require('passport-facebook').Strategy,
-    options: {
-      clientID: '761630490590064',
-      clientSecret: 'dd033f7029bfc8785e343fc122285d50'
-    }
-  }
+  // facebook: {
+  //   name: 'Facebook',
+  //   protocol: 'oauth2',
+  //   strategy: require('passport-facebook').Strategy,
+  //   options: {
+  //     clientID: '761630490590064',
+  //     clientSecret: 'dd033f7029bfc8785e343fc122285d50'
+  //   }
+  // }
   // ,
 
   // google: {

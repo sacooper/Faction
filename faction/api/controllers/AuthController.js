@@ -107,7 +107,7 @@ var AuthController = {
    * Create a authentication callback endpoint
    *
    * This endpoint handles everything related to creating and verifying Pass-
-   * ports and users, both locally and from third-aprty providers.
+   * ports and users, both locally and from third-party providers.
    *
    * Passport exposes a login() function on req (also aliased as logIn()) that
    * can be used to establish a login session. When the login operation
@@ -163,6 +163,8 @@ var AuthController = {
 
         // Upon successful login, send the user to the homepage were req.user
         // will available.
+        console.log('req.user', req.user);
+        console.log('req.session', req.session);
         res.redirect('/');
       });
     });
