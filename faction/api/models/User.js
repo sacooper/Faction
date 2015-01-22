@@ -5,6 +5,13 @@ var User = {
   attributes: {
     username  : { type: 'string', unique: true },
     email     : { type: 'email',  unique: true },
+    factions  : {
+    	collection: 'faction',
+        via: 'sender'
+    },
+    friends   : {
+    	collection: 'user'
+    },
     passports : { collection: 'Passport', via: 'user' }
   }
 };
