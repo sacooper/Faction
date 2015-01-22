@@ -16,12 +16,14 @@
     - must be included in all subsequent API calls to be authenticated
 
 ### Change Password
-#### /api/user/update_password/:id (PUT)
+#### /api/user/update_password/ (PUT)
 - JSON object: {old, new}
 - client must verify password confirmation
 - Success: 200 Ok
-- Error: 404 Not Found
-    - Will occur with invalid ID
+- Error: 500 Internal Server Error
+    - Something really bad happened
+- Error: 403 Forbidden
+    - If user isn't logged in or bad old password
 - No body in response
 
 ### Log into Account

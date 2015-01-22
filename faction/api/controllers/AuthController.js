@@ -97,48 +97,45 @@ var AuthController = {
 
 
   updatepassword: function (req, res){
+    var userId = req.user.id;
+    var oldPwd = req.param('old');
+    var newPwd = req.param('new');
+
+    var afterUpdate = function(err, updates) {
+      if(err) {
+        res.status(500).send(err);
+      }
+      if(updates.length == 0) {
+        return res.json({message: "No updates"});
+      }
+      return res.json({message: "Update successful"})
+    };
+
     var update = function(err, valid){
       if (!err){
         if (valid){
-            bcrypt.hash(req.param('new'), 10, function (err, hash) {
-              if (!err){
-                Passport.update({user:req.user.id, protocol:'local'}, {password:hash});
-                res.json({});
-              }
-              else
-                sails.log(err);
-            });
+          Passport.update({
+              user : userId, protocol:'local'
+            },{
+              password : newPwd
+            })
+          .exec(afterUpdate);
         } else {
-          sails.log("Invalid old password");
+          res.status(403).send("Invalid old password");
         }
       } else {
-        sails.log("Error: " + err);
+        res.status(500).send(err);
       }
     };
 
-
-    var old = req.param('old');
+    if(req.user.id === undefined) {
+      return res.status(403).send('');
+    }
 
     Passport.findOne()
       .where({user:req.user.id, protocol: 'local'})
       .then(function(passport){
-        passport.validatePassword(old, update)})
-
-
-    
-    // User.findOne().where({id:req.user.id})
-    //   .populate("passports")
-    //   .then(function(user){
-    //     Passport.update({user.passports.id})
-    //   })
-      // .then(function(user){
-      //   sails.log(user);
-      // });
-    // User.update({id:req.user.id}, {})
-    //   .then(function(user){
-    //     sails.log(user);
-    //     return res.json({});
-    //   });
+        passport.validatePassword(oldPwd, update)})
 
   },
 

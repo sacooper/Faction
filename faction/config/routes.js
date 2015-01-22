@@ -24,17 +24,18 @@ module.exports.routes = {
 
   /** AUTH **/
 
-  'get /api/user/login': 'AuthController.login',
-  'get /api/user/logout': 'AuthController.logout',
-  'get /api/user/new': 'AuthController.register',
-  'get /api/user/update_password': 'AuthController.updatepassword',
+  'get /api/user/login'             : 'AuthController.login',
+  'get /api/user/logout'            : 'AuthController.logout',
+  'get /api/user/new'               : 'AuthController.register',
+  
+  'put /api/user/update_password'   : 'AuthController.updatepassword',
 
-  'post /api/auth/local': 'AuthController.callback',
-  'post /api/auth/local/:action': 'AuthController.callback',
+  'post /api/auth/local'            : 'AuthController.callback',
+  'post /api/auth/local/:action'    : 'AuthController.callback',
 
-  'get /api/auth/:provider': 'AuthController.provider',
+  'get /api/auth/:provider'         : 'AuthController.provider',
   'get /api/auth/:provider/callback': 'AuthController.callback',
-  'get /api/auth/:provider/:action': 'AuthController.callback',
+  'get /api/auth/:provider/:action' : 'AuthController.callback',
 
   /***************************************************************************
   *                                                                          *
