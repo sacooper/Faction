@@ -8,7 +8,13 @@
 module.exports = {
 
   attributes: {
-
+  	faction		: {
+  		model: 'faction'
+  	},
+  	commenter   : {
+        model: 'user'
+    },
+    message: { type: 'string' }
   }
 };
 

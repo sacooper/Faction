@@ -8,9 +8,24 @@
 module.exports = {
 
   attributes: {
-		sender:{
-            model:'user'
-        }
+	sender   : {
+        model: 'user'
+    },
+    recipients: {
+    	collection: 'user'
+    },
+    comments : {
+    	collection: 'comment',
+    	via: 'faction'
+    },
+    trueResponses : {
+    	type: 'integer'
+    },
+    falseResponses : {
+    	type: 'integer'
+    },
+    story    : { type: 'string' },
+    fact     : { type: 'boolean' }
   }
 };
 

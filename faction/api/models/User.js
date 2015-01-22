@@ -9,7 +9,13 @@ var User = {
     	collection: 'faction',
         via: 'sender'
     },
-    friends   : {
+    pendingTo : {
+    	collection: 'user'
+    },
+    pendingFrom : {
+    	collection: 'user'
+    },
+    friends : {
     	collection: 'user'
     },
     passports : { collection: 'Passport', via: 'user' }

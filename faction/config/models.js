@@ -18,5 +18,8 @@ module.exports.models = {
   *                                                                          *
   ***************************************************************************/
 
-  connection: 'someMongodbServer'
+  connection: 'factiondb',
+
+  migrate:'safe'
+
 };
