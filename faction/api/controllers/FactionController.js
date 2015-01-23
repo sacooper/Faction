@@ -8,10 +8,14 @@
 module.exports = {
 	/** Creation of a faction **/
 	create: function(req, res){
+		var sender = req.user;
+
+		if (sender == null || sender == undefined){
+			res.status(400).send("No sender included");}
+			
 		var to = req.param('to');
 		var faction = req.param('faction');
 		var fact = req.param('fact');
-		var sender = req.user;
 		var recipients = [];
 
 		if (fact == null || to == undefined){
@@ -20,8 +24,7 @@ module.exports = {
 		if (faction == null || faction == undefined){
 			res.status(400).send("No faction sent");}
 
-		if (to == null || to
-		 == undefined || to.length == 0 ){
+		if (to == null || to == undefined || to.length == 0 ){
 			res.status(400).send("No recipients sent");}
 
 		to.forEach(function(r){
