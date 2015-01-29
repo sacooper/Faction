@@ -14,12 +14,15 @@ module.exports = {
     },
     factions  : {
     	collection: 'faction',
-        via: 'sender'
+      via: 'sender'
+    },
+    factionsReciever : {
+      collection: 'faction'
     },
     pendingFactions : {
-        collection: 'faction'
+      collection: 'faction'
     },
-    pendingTo : {
+    new_friends : {
     	collection: 'user'
     },
     pendingFrom : {
