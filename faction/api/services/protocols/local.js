@@ -66,7 +66,6 @@ exports.register = function (req, res, next) {
     , password : password
     , user     : user.id
     }, function (err, passport) {
-      sails.log("In passport creation?");
 
       if (err) {
         if (err.code === 'E_VALIDATION') {

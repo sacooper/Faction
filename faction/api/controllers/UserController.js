@@ -75,6 +75,10 @@ module.exports = {
 					.populate('pendingTo')
 					.then(function(me) {
 
+						if(me.id === friend.id) {
+							res.json({error: 'You cannot add yourself.'})
+						}
+
 						if(_.some(me.friends, function(f){return f.id === friend.id})
 							&& _.some(friend.friends, function(f){return f.id === me.id})) {
 							res.json({error: 'You are already friends with ' + friend.username})
@@ -109,6 +113,7 @@ module.exports = {
 	addFriend: function(req, res) {
 
 		var requestError = function(err) {
+			sails.log(err);
 			res.json({error: "Error in posting the request."});
 		};
 
@@ -117,14 +122,14 @@ module.exports = {
 				&& _.some(me.pendingTo, function(f){return f.id == friend.id;})) {
 				res.json({error: 'Already posted a request'})
 			}
-		}
+		};
 
 		var alreadyFriends = function(me, friend) {
 			if(_.some(friend.friends, function(f){return f.id === me.id;}) 
 				&& _.some(me.friends, function(f){return f.id === friend.id;})) {
 				res.json({error: 'Already friends with' + friend.username})
 			}
-		}
+		};
 
 		var reverseRequest = function(me, friend) {
 			if(_.some(friend.pendingTo, function(f){return f.id === me.id;})
@@ -145,23 +150,30 @@ module.exports = {
 					});
 				});
 			}
-		}
+		};
 
 		var friendUsername = req.param('username');
 		var myId = req.user.id;
+
+		sails.log(myId);
 
 		User.findOne()
 			.where({username: friendUsername})
 			.populate('pendingFrom')
 			.populate('friends')
 			.populate('newFriends')
-			.then(function(friend){
+			.then(function(friend) {
+
 				User.findOne()
 					.where({id: myId})
 					.populate('pendingTo')
-					.popupate('friends')
+					.populate('friends')
 					.populate('newFriends')
-					.then(function(me){
+					.then(function(me) {
+
+						if(me.id === friend.id) {
+							res.json({error: 'You cannot add yourself.'})
+						}
  
  						// Already did a friend request
 						alreadyRequested(me, friend);
