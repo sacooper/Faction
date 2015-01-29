@@ -30,7 +30,7 @@
 #### /api/user/login (POST)
 - JSON object: {email, password}
 - Success: 200 OK
-    - Body contains {id}
+    - Contains cooking with session id
 - Error: 401 Unauthorized
     - Will occur with invalid password
     - No body
@@ -47,11 +47,12 @@
     - "fact" will be set to "true" (lowercase) if faction is true, faction will be considered false otherwise
 - Success: 201 Created
     - Body contains {faction_id}, uniquely generated ID to identify faction by
-- Error: 404 Not Found
-    - {error:""}
-    - invalid ID or any of the usernames is invalid
-        - invalid username MAY BE one that exists, but user does not have permission to send to (shouldn't ever happen?)
-    - Will contains invalid usernames if that is the case
+- Error: 400 Bad Request
+    - Body contains string of error
+    - Errors include something not being present
+- Error: 500 Internal Server Error
+    - Something wierd happened
+    - Error returned
 
 ### Updating
 #### /api/update/:id (GET)
@@ -61,8 +62,11 @@
     - new_friends: Empty list if no new friends (i.e. pending friend requests that have been approved), otherwise, list of usernames with approved friends
     - pending_requests: Empty list if no new pending requests, otherwise, list contains usernames of people who requested to be this person's friend
     - Should subsequently send GET request to /api/factions/get?id=...&faction_id=... to get factions
-- Error: 404 Not Found
-    - Invalid ID in query parameters
+- Error: 400 Bad Request
+    - Something wrong with the user's session
+- Error: 500 Internal Server Error
+    - Something wierd happened
+    - Error returned
 
 ### Sending a Friend Request
 #### /api/users/request_friend/:id (POST)

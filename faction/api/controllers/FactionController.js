@@ -53,6 +53,7 @@ module.exports = {
 					user.save(); })
 				res.status(201).send();	
 			} else {
+				sails.log(err);
 				res.status(500).send(err);
 			}
 		});

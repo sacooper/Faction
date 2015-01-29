@@ -37,9 +37,11 @@ module.exports.routes = {
   'get /api/auth/:provider/callback': 'AuthController.callback',
   'get /api/auth/:provider/:action' : 'AuthController.callback',
 
-
   /** Faction sending/recieving **/
   'post /api/factions/send'         : 'FactionController.create',
+
+  /** Get user udpates **/
+  'get /api/update'                 : 'UserController.update',
 
 
   /***************************************************************************
