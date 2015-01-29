@@ -19,7 +19,7 @@
 
 module.exports.policies = {
 
-  '*': [ 'passport' ]
+  '*': [ 'passport' ],
 
   /***************************************************************************
   *                                                                          *
@@ -36,6 +36,25 @@ module.exports.policies = {
   * and its actions                                                          *
   *                                                                          *
   ***************************************************************************/
+
+  FactionController: {
+    '*': ['passport','sessionAuth']
+  },
+
+  UserController: {
+    update              : ['passport','sessionAuth'],
+    addFriend           : ['passport','sessionAuth'],
+    acceptFriendRequest : ['passport','sessionAuth'],
+  },
+
+  AuthController : {
+    logout              : ['passport','sessionAuth'],
+    updatepassword      : ['passport','sessionAuth'],
+    login               : ['passport','notLoggedIn'],
+    register            : ['passport','notLoggedIn'],
+  }
+
+
 	// RabbitController: {
 
 		// Apply the `false` policy as the default for all of RabbitController's actions

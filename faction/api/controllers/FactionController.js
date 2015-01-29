@@ -6,6 +6,12 @@
  */
 
 module.exports = {
+	/** TODO: Respond to a faction **/
+	respond: function(req, res){
+		res.status(200)
+	},
+
+
 	/** Creation of a faction **/
 	create: function(req, res){
 		var sender = req.user;

@@ -16,7 +16,7 @@ module.exports = {
     	collection: 'faction',
       via: 'sender'
     },
-    factionsReciever : {
+    factionsReceived : {
       collection: 'faction'
     },
     pendingFactions : {

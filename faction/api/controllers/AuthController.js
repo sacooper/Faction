@@ -70,9 +70,14 @@ var AuthController = {
    * @param {Object} res
    */
   logout: function (req, res) {
-    req.logout();
-    req.session.destroy();
-    res.redirect('/');
+    req.session.destroy(function(err){
+      if (err) {
+        sails.log(err);}
+
+      req.logout();
+      res.clearCookie('sails.sid', {path : '/'});
+      res.status(401).send();
+    });
   },
 
   /**
