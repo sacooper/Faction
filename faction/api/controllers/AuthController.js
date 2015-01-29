@@ -71,6 +71,7 @@ var AuthController = {
    */
   logout: function (req, res) {
     req.logout();
+    req.session.destroy();
     res.redirect('/');
   },
 
@@ -106,9 +107,11 @@ var AuthController = {
         res.status(500).send(err);
       }
       if(updates.length == 0) {
-        return res.json({message: "No updates"});
+        res.status(200).json({message: "No updates"});
+        return;
       }
-      return res.json({message: "Update successful"})
+      res.status(200).json({message: "Update successful"})
+      return;
     };
 
     var update = function(err, valid){
@@ -122,14 +125,18 @@ var AuthController = {
           .exec(afterUpdate);
         } else {
           res.status(403).send("Invalid old password");
+          return;
         }
       } else {
         res.status(500).send(err);
+        sails.log(err);
+        return;
       }
     };
 
     if(req.user.id === undefined) {
-      return res.status(403).send('');
+      res.status(403).send('');
+      return;
     }
 
     Passport.findOne()
