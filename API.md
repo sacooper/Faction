@@ -69,8 +69,8 @@
     - Error returned
 
 ### Sending a Friend Request
-#### /api/users/request_friend/:id (POST)
-- JSON object {friend}
+#### /api/users/request_friend/ (POST)
+- JSON object {username}
     - Friend contains username of person to request
 - Success: 201 Created
     - No Body, occurs on successful cration of friend request
@@ -89,10 +89,10 @@
     - Error may be invalid id or invalid faction_id
 
 ### Responding to a Friend Request
-#### /api/users/accept_friend:id (POST)
+#### /api/users/accept_friend (POST)
 - JSON object {username, accepted}
     - Friend contains username of person accepting
-    - Will accept if accepted is "true", assumed false otherwise
+    - Will accept if accepted is true, assumed false otherwise
 - Success: 200 OK
 - Error: 404 Not Found
     - Body contains {error:""}

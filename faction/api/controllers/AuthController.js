@@ -185,15 +185,20 @@ var AuthController = {
       // These views should take care of rendering the error messages.
       var action = req.param('action');
 
+      sails.log(req.flash);
+
       switch (action) {
         case 'register':
-          res.redirect('/register');
+          res.json({error: 'Error registering'});
+          // res.redirect('/register');
           break;
         case 'disconnect':
-          res.redirect('back');
+          res.json({error: 'Error disconnecting'});
+          // res.redirect('back');
           break;
         default:
-          res.redirect('/login');
+          res.json({error: 'Error logging in'});
+          // res.redirect('/login');
       }
     }
 

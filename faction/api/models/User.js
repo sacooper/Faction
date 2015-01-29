@@ -25,6 +25,9 @@ module.exports = {
     new_friends : {
     	collection: 'user'
     },
+    pending_to  : {
+      collection: 'user'
+    },
     pendingFrom : {
     	collection: 'user'
     },

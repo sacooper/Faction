@@ -43,6 +43,11 @@ module.exports.routes = {
   /** Get user udpates **/
   'get /api/update'                 : 'UserController.update',
 
+  /** Sending a frient request **/
+  'post /api/users/request_friend/:friendId'   : 'UserController.addFriend',
+
+  /** Response to a friend request **/
+  'post /api/users/accept_friend/:id'    : 'UserController.acceptFriendRequest',
 
   /***************************************************************************
   *                                                                          *
