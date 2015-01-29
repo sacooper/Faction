@@ -44,10 +44,10 @@ module.exports.routes = {
   'get /api/update'                 : 'UserController.update',
 
   /** Sending a frient request **/
-  'post /api/users/request_friend/:friendId'   : 'UserController.addFriend',
+  'post /api/user/request_friend'   : 'UserController.addFriend',
 
   /** Response to a friend request **/
-  'post /api/users/accept_friend/:id'    : 'UserController.acceptFriendRequest',
+  'post /api/user/accept_friend'    : 'UserController.acceptFriendRequest',
 
   /***************************************************************************
   *                                                                          *

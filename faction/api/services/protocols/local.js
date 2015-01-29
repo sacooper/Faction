@@ -27,6 +27,7 @@ exports.register = function (req, res, next) {
     , username = req.param('username')
     , password = req.param('password');
 
+
   if (!email) {
     req.flash('error', 'Error.Passport.Email.Missing');
     return next(new Error('No email was entered.'));
@@ -60,12 +61,13 @@ exports.register = function (req, res, next) {
 
       return next(err);
     }
-
     Passport.create({
       protocol : 'local'
     , password : password
     , user     : user.id
     }, function (err, passport) {
+      sails.log("In passport creation?");
+
       if (err) {
         if (err.code === 'E_VALIDATION') {
           req.flash('error', 'Error.Passport.Password.Invalid');
@@ -75,7 +77,6 @@ exports.register = function (req, res, next) {
           next(destroyErr || err);
         });
       }
-
       next(null, user);
     });
   });

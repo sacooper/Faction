@@ -22,10 +22,10 @@ module.exports = {
     pendingFactions : {
       collection: 'faction'
     },
-    new_friends : {
+    newFriends : {
     	collection: 'user'
     },
-    pending_to  : {
+    pendingTo  : {
       collection: 'user'
     },
     pendingFrom : {

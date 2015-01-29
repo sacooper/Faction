@@ -192,8 +192,6 @@ var AuthController = {
       // These views should take care of rendering the error messages.
       var action = req.param('action');
 
-      sails.log(req.flash);
-
       switch (action) {
         case 'register':
           res.json({error: 'Error registering'});
