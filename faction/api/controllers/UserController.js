@@ -68,32 +68,40 @@ module.exports = {
 			.populate('newFriends')
 			.populate('pendingFrom')
 			.then(function(friend) {
+				User.findOne()
+					.where({id: myId})
+					.populate('friends')
+					.populate('newFriends')
+					.populate('pendingTo')
+					.then(function(me) {
 
-				// TODO: check if there's a request
-				// TODO: check if they are already friends
-				if(accepted) {
-					// add to friends
-					friend.newFriends.add(myId);
-					friend.friends.add(myId);
-				}
-				friend.pendingFrom.remove(myId);
-				friend.save(function(err) {
-					User.findOne()
-						.where({id: myId})
-						.populate('friends')
-						.populate('newFriends')
-						.populate('pendingTo')
-						.then(function(me) {
-							if(accepted) {
-								me.newFriends.add(friend.id);
-								me.friends.add(friend.id);
-							}
-							me.pendingTo.remove(friend.id)
+						if(_.some(me.friends, function(f){return f.id === friend.id})
+							&& _.some(friend.friends, function(f){return f.id === me.id})) {
+							res.json({error: 'You are already friends with ' + friend.username})
+						}
+
+						me.pendingTo.remove(friend.id);
+						friend.pendingFrom.remove(myId);
+
+						if(accepted) {
+							me.newFriends.add(friend.id);
+							me.friends.add(friend.id);
+
+							friend.newFriends.add(myId);
+							friend.friends.add(myId);
 							me.save(function(err) {
-								res.json({message: 'Successfully added ' + friend.username});
+								friend.save(function(err) {
+									res.json({message: 'Successfully added ' + friend.username});	
+								});
 							});
+						} else {
+							me.save(function(err) {
+								friend.save(function(err) {
+									res.json({message: 'Successfully removed request from ' + friend.username});	
+								});
+							});
+						}
 					}).catch(addFriendError);
-				});
 			}).catch(addFriendError);
 
 	},
@@ -105,22 +113,22 @@ module.exports = {
 		};
 
 		var alreadyRequested = function(me, friend) {
-			if(friend.pendingFrom.indexOf(me.id) !== -1 
-				&& me.pendingTo.indexOf(friend.id) !== -1) {
+			if(_.some(friend.pendingFrom, function(f){return f.id === me.id;}) 
+				&& _.some(me.pendingTo, function(f){return f.id == friend.id;})) {
 				res.json({error: 'Already posted a request'})
 			}
 		}
 
 		var alreadyFriends = function(me, friend) {
-			if(friend.friends.indexOf(me.id) !== -1 
-				&& me.friends.indexOf(friend.id) !== -1) {
+			if(_.some(friend.friends, function(f){return f.id === me.id;}) 
+				&& _.some(me.friends, function(f){return f.id === friend.id;})) {
 				res.json({error: 'Already friends with' + friend.username})
 			}
 		}
 
 		var reverseRequest = function(me, friend) {
-			if(_.some(friend.pendingTo, function(f){return f.id == me.id;})
-				&& _.some(me.pendingFrom, function(f){return f.id == friend.id;})) {
+			if(_.some(friend.pendingTo, function(f){return f.id === me.id;})
+				&& _.some(me.pendingFrom, function(f){return f.id === friend.id;})) {
 				// Add them as friends
 				friend.pendingTo.remove(me.id);
 				me.pendingFrom.remove(friend.id);
