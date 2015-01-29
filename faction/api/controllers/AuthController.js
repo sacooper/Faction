@@ -102,7 +102,7 @@ var AuthController = {
   },
 
 
-  updatepassword: function (req, res){
+  updatePassword: function (req, res){
     var userId = req.user.id;
     var oldPwd = req.param('old');
     var newPwd = req.param('new');

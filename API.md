@@ -16,7 +16,7 @@
     - must be included in all subsequent API calls to be authenticated
 
 ### Change Password
-#### /api/user/update_password (PUT)
+#### /api/user/update-password (PUT)
 - JSON object: {old, new}
 - client must verify password confirmation
 - Success: 200 Ok
@@ -39,7 +39,7 @@
 
 ## General Usage
 ### Sending a faction
-#### /api/factions/send/:id (POST)
+#### /api/factions/send (POST)
 - JSON object {to:[], faction, fact}
     - "to" contains a list of usernames for recipients
     - "faction" contains the text of the faction
@@ -57,7 +57,7 @@
 #### /api/update (GET)
 - Success: 200 OK
     - Body contains {factions:[], new_friends:[], pending_requests:[], responses[{faction_id, response}]}
-    - factions: Empty list if no new factions, otherwise IDs of new factions
+    - factions: Empty list if no new factions, otherwise list of {faction_id, story, sender, fact}
     - new_friends: Empty list if no new friends (i.e. pending friend requests that have been approved), otherwise, list of usernames with approved friends
     - pending_requests: Empty list if no new pending requests, otherwise, list contains usernames of people who requested to be this person's friend
     - Should subsequently send GET request to /api/factions/get?id=...&faction_id=... to get factions
@@ -68,7 +68,7 @@
     - Error returned
 
 ### Sending a Friend Request
-#### /api/users/request_friend/ (POST)
+#### /api/users/request-friend (POST)
 - JSON object {username}
     - Friend contains username of person to request
 - Success: 201 Created
@@ -88,7 +88,7 @@
     - Error may be invalid id or invalid faction_id
 
 ### Responding to a Friend Request
-#### /api/users/accept_friend (POST)
+#### /api/users/accept-friend (POST)
 - JSON object {username, accepted}
     - Friend contains username of person accepting
     - Will accept if accepted is true, assumed false otherwise

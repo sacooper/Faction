@@ -28,7 +28,7 @@ module.exports.routes = {
   'get /api/user/logout'            : 'AuthController.logout',
   'get /api/user/new'               : 'AuthController.register',
   
-  'put /api/user/update_password'   : 'AuthController.updatepassword',
+  'put /api/user/update-password'   : 'AuthController.updatePassword',
 
   'post /api/auth/local'            : 'AuthController.callback',
   'post /api/auth/local/:action'    : 'AuthController.callback',
@@ -45,10 +45,10 @@ module.exports.routes = {
   'get /api/update'                 : 'UserController.update',
 
   /** Sending a frient request **/
-  'post /api/user/request_friend'   : 'UserController.addFriend',
+  'post /api/user/request-friend'   : 'UserController.addFriend',
 
   /** Response to a friend request **/
-  'post /api/user/accept_friend'    : 'UserController.acceptFriendRequest',
+  'post /api/user/accept-friend'    : 'UserController.acceptFriendRequest',
 
   /***************************************************************************
   *                                                                          *

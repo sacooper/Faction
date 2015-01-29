@@ -24,7 +24,11 @@ module.exports = {
 			var response 		 = [];
 
 			factions 		 = factions.map(
-								function(f){return f.id;});
+								function(f){
+									return {
+										faction_id : f.id, 
+										sender : f.sender,
+										story  : f.}});
 			new_friends 	 = new_friends.map(
 								function(f){return f.username;});
 			pending_requests = pending_requests.map(
@@ -59,6 +63,7 @@ module.exports = {
 		var myId = req.user.id;
 
 		var addFriendError = function(err) {
+			sails.log(err);
 			res.json({error: 'Could not add new friend'})
 		};
 
