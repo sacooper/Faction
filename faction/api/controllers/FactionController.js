@@ -37,13 +37,31 @@ module.exports = {
 			User.findOne()
 				.where({username : r})
 				.populate('pendingFactions')
-				.then(function(p){
-					if (p.friends.indexOf(sender.id) != -1)
-						recipients.push(p);})})
+				.populate('factionsReceived')
+				.populate('friends')
+				.exec(function(err, p){
+					// console.log('P\n', p);
+					// p.friends.add(sender);
+					// p.save(function(err, p2){
+					// 	console.log("P2\n", p2, "err", err);
+					// 	;
+					// 	p.friends.remove(sender.id);
+					// 	p.save(function(err, p3){
+					// 		console.log("P3\n", p3);
+					// 	})
+					// })
+					if (err){
+						sails.log(err);
+						return res.status(500).send(err)
+					};
+
+					if (_.some(p.friends, function(f){return f.id == sender.id;})){
+						recipients.push(p); }})})
 
 		if (recipients.length == 0){
 			res.status(400).send("No valid recipients sent");
 		}
+
 		Faction.create({
 			sender : sender,
 			recipients : recipients,
@@ -55,7 +73,7 @@ module.exports = {
 		}, function(err, faction){
 			if (!err){	
 				recipients.forEach(function(user){
-					user.pendingFactions.push(faction.id);
+					user.pendingFactions.add(faction);
 					user.save(); })
 				res.status(201).send();	
 			} else {
