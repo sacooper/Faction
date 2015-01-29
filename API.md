@@ -16,15 +16,14 @@
     - must be included in all subsequent API calls to be authenticated
 
 ### Change Password
-#### /api/user/update_password/ (PUT)
+#### /api/user/update_password (PUT)
 - JSON object: {old, new}
 - client must verify password confirmation
 - Success: 200 Ok
 - Error: 500 Internal Server Error
-    - Something really bad happened
+    - Something bad happened
 - Error: 403 Forbidden
     - If user isn't logged in or bad old password
-- No body in response
 
 ### Log into Account
 #### /api/user/login (POST)
@@ -55,7 +54,7 @@
     - Error returned
 
 ### Updating
-#### /api/update/:id (GET)
+#### /api/update (GET)
 - Success: 200 OK
     - Body contains {factions:[], new_friends:[], pending_requests:[], responses[{faction_id, response}]}
     - factions: Empty list if no new factions, otherwise IDs of new factions
@@ -69,7 +68,7 @@
     - Error returned
 
 ### Sending a Friend Request
-#### /api/users/request_friend/:id (POST)
+#### /api/users/request_friend (POST)
 - JSON object {friend}
     - Friend contains username of person to request
 - Success: 201 Created
@@ -79,7 +78,7 @@
     - Possible errors: "Invalid id", "username does not exist"
 
 ### Sending Response to a Faction
-#### /api/factions/:id/:faction_id
+#### /api/factions/respond
 - JSON object {fact}
     - Considered true if fact set to "true", false otherwise
 - Success: 200 OK

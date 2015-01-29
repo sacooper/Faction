@@ -16,13 +16,13 @@ module.exports = {
     	collection: 'faction',
       via: 'sender'
     },
-    factionsReciever : {
+    factionsReceived : {
       collection: 'faction'
     },
     pendingFactions : {
       collection: 'faction'
     },
-    new_friends : {
+    newFriends : {
     	collection: 'user'
     },
     pendingFrom : {
