@@ -51,3 +51,7 @@ sftp-config.json
 
 # ignore database passwords
 connections.js
+
+
+nohup.out
+session.js
