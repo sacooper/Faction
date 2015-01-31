@@ -28,7 +28,8 @@ module.exports = {
 									return {
 										faction_id : f.id, 
 										sender : f.sender,
-										story  : f.}});
+										story  : f.stroy,
+										fact : f.fact}});
 			new_friends 	 = new_friends.map(
 								function(f){return f.username;});
 			pending_requests = pending_requests.map(
