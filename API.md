@@ -27,7 +27,7 @@
 
 ### Log into Account
 #### /api/user/login (POST)
-- JSON object: {email, password}
+- x-www-form-urlencoded, with fields "identifier" and "password"
 - Success: 200 OK
     - Contains cooking with session id
 - Error: 401 Unauthorized
