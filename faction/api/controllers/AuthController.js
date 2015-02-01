@@ -222,7 +222,8 @@ var AuthController = {
           return tryAgain();
         }
 
-        res.redirect('/');
+        // res.redirect('/');
+        res.send('');
       });
     });
   },
