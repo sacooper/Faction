@@ -76,7 +76,7 @@ var AuthController = {
 
       req.logout();
       res.clearCookie('sails.sid', {path : '/'});
-      res.status(401).send();
+      res.status(200).send();
     });
   },
 
@@ -199,15 +199,15 @@ var AuthController = {
 
       switch (action) {
         case 'register':
-          res.json({error: 'Error registering'});
+          res.status(401).json({error: 'Error registering'});
           // res.redirect('/register');
           break;
         case 'disconnect':
-          res.json({error: 'Error disconnecting'});
+          res.status(401).json({error: 'Error disconnecting'});
           // res.redirect('back');
           break;
         default:
-          res.json({error: 'Error logging in'});
+          res.status(401).json({error: 'Error logging in'});
           // res.redirect('/login');
       }
     }

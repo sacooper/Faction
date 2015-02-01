@@ -31,11 +31,7 @@
 - Success: 200 OK
     - Contains cooking with session id
 - Error: 401 Unauthorized
-    - Will occur with invalid password
-    - No body
-- Error: 404 Not Found
-    - Will occur with invalid email address
-    - No body
+    - Will occur with invalid credentials
 
 ## General Usage
 ### Sending a faction
