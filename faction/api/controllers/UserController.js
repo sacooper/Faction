@@ -6,6 +6,32 @@
  */
 
 module.exports = {
+	search: function(req, res){
+		var str = req.param('search');
+
+		if (str == undefined) {
+			User.find().exec(function (err, users) {
+			if (err) {
+				sails.log(err);
+				return res.send(500);
+			} else {
+				return res.send(users
+					.filter(function(u){return u.username != null;})
+					.map(function(u){return u.username;}));
+			}});
+		} else {
+			User.find({username : {'contains' : str}}).exec(function(err, users){
+			if (err) {
+				sails.log(err);
+				return res.send(500);
+			} else {
+				return res.send(users
+					.filter(function(u){return u.username != null;})
+					.map(function(u){return u.username;}));
+			}});
+		}
+	},
+
 	update: function(req, res){
 		if (req.user == null || req.user == undefined){
 			req.status(400).send("No user included")

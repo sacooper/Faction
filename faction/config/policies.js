@@ -42,6 +42,7 @@ module.exports.policies = {
   },
 
   UserController: {
+    search              : ['passport','sessionAuth'],
     update              : ['passport','sessionAuth'],
     addFriend           : ['passport','sessionAuth'],
     acceptFriendRequest : ['passport','sessionAuth'],

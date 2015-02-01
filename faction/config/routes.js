@@ -29,15 +29,15 @@ module.exports.routes = {
   'post /api/user/logout'           : 'AuthController.logout',
   'post /api/user/login'            : 'AuthController.callback',
   'get /api/user/new'               : 'AuthController.register',
-  
+
   'put /api/user/update-password'   : 'AuthController.updatePassword',
 
   'post /api/auth/local'            : 'AuthController.callback',
   'post /api/auth/local/:action'    : 'AuthController.callback',
 
   'get /api/auth/:provider'         : 'AuthController.provider',
-  'get /api/auth/:provider/callback': 'AuthController.callback',
   'get /api/auth/:provider/:action' : 'AuthController.callback',
+  'get /api/auth/:provider/callback': 'AuthController.callback',
 
   /** Faction related routes **/
   'post /api/factions/send'         : 'FactionController.create',
@@ -52,6 +52,8 @@ module.exports.routes = {
   /** Response to a friend request **/
   'post /api/user/accept-friend'    : 'UserController.acceptFriendRequest',
 
+  /** Get all users**/
+  'get /api/user/search'            : 'UserController.search',
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
