@@ -53,6 +53,7 @@ module.exports.policies = {
     updatepassword      : ['passport','sessionAuth'],
     login               : ['passport','notLoggedIn'],
     register            : ['passport','notLoggedIn'],
+    callback            : ['passport','notLoggedIn'],
   }
 
 

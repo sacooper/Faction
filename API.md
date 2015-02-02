@@ -5,7 +5,7 @@
 ## Account Management
 ### Create an Account
 #### /api/user/new (POST)
-- JSON object: {email, password, username}
+- JSON object: {email, password, username, "action":"register"}
 - client must verify password confirmation
 - success: 201 Created
 - error: 409 Conflict
@@ -27,7 +27,7 @@
 
 ### Log into Account
 #### /api/user/login (POST)
-- x-www-form-urlencoded, with fields "identifier" and "password"
+- JSON object: {identifier:"", password:""}
 - Success: 200 OK
     - Contains cooking with session id
 - Error: 401 Unauthorized
