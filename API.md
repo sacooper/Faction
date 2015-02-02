@@ -33,6 +33,11 @@
 - Error: 401 Unauthorized
     - Will occur with invalid credentials
 
+### Log Out
+#### /api/user/logout (POST)
+- Success:200 OK
+- Error: 403 Forbidden
+
 ## General Usage
 ### Sending a faction
 #### /api/factions/send (POST)
