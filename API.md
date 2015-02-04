@@ -7,7 +7,7 @@
 #### /api/user/new (POST)
 - JSON object: {email, password, username, "action":"register"}
 - client must verify password confirmation
-- success: 201 Created
+- success: 200 OK
 - error: 409 Conflict
     - body will contain {error: ""}
     - Username already in use, or email already in use
