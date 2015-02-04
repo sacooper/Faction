@@ -74,9 +74,7 @@
     - Friend contains username of person to request
 - Success: 201 Created
     - No Body, occurs on successful cration of friend request
-- Error: 404 Not found
-    - Body contains JSON object {error:}
-    - Possible errors: "Invalid id", "username does not exist"
+- Error: 403 Forbidden - user not logged in
 
 ### Sending Response to a Faction
 #### /api/factions/respond
@@ -84,9 +82,7 @@
     - Considered true if fact set to "true", false otherwise
 - Success: 200 OK
     - **Do we need request body here?**
-- Error: 404 Not Found
-    - Body contains {error:""}
-    - Error may be invalid id or invalid faction_id
+- Error: 403 forbidden - user not lgoged in
 
 ### Responding to a Friend Request
 #### /api/users/accept-friend (POST)
@@ -94,6 +90,15 @@
     - Friend contains username of person accepting
     - Will accept if accepted is true, assumed false otherwise
 - Success: 200 OK
-- Error: 404 Not Found
-    - Body contains {error:""}
-    - Error may be invalid id or invalid username
+- Error: 403 Forbidden - user not logged in
+
+### Searching for Users
+#### /api/user/search (GET)
+- Optional query parameter search=""
+    - If search paramater not included, returns a list of all users, otherwise only returns users with usernames containing that substring
+- Success: 200 OK
+    - Body contains JSON object {friends : []}, containing list of usernames of user's friends
+- Error: 403 Forbidden 
+    - user not logged in
+- Error: 500 Internal Server Error
+    - error returned

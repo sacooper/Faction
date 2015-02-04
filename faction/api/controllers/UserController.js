@@ -6,6 +6,24 @@
  */
 
 module.exports = {
+	friends: function(req, res){
+		var cb = function(err, user){
+			if (err){
+				sails.log(err);
+				return res.status(500);
+			} else {
+				var friends = user.friends.map(function(f){return f.username;});
+				res.status(200).send({friends: friends});
+			}
+		}
+
+		var user = User.findOne()
+			.where({id : req.user.id})
+			.populate('friends')
+			.exec(cb);
+
+	},
+
 	search: function(req, res){
 		var str = req.param('search');
 
@@ -13,7 +31,7 @@ module.exports = {
 			User.find().exec(function (err, users) {
 			if (err) {
 				sails.log(err);
-				return res.send(500);
+				return res.status(500).send(err);
 			} else {
 				return res.send(users
 					.filter(function(u){return u.username != null;})
