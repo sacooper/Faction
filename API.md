@@ -103,7 +103,7 @@
 - Error: 500 Internal Server Error
     - error returned
 
-### Getting all user information
+### Getting user's friends
 #### /api/user/friends (GET)
 - Success: 200 OK
     - Body contains JSON object {friends: []}, the array contains username strings
