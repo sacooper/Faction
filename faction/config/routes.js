@@ -56,8 +56,14 @@ module.exports.routes = {
   /** Get all users**/
   'get /api/user/search'            : 'UserController.search',
 
-  /** Get a users full information **/
-  'get /api/user/friends'           : 'UserController.friends',
+  /** Get a user's friends **/
+  'get /api/user/friends'           : 'UserController.friends',  
+
+  /** Get a user's friends **/
+  'get /api/user/factions'          : 'UserController.factions',
+
+  /** Get a user's full information **/
+  'get /api/user/info'              : 'UserController.getAllInfo',
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *

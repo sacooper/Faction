@@ -6,6 +6,86 @@
  */
 
 module.exports = {
+
+	getAllInfo: function(req, res) {
+		var userId = req.user.id;
+
+		User.findOne()
+			.where({id: req.user.id})
+			.populate("friends")
+			.populate("factionsReceived")
+			.populate("factions")
+			.then(function(me) {
+
+				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
+
+				User.find({id: senderIds})
+					.exec(function(err, users) {
+						if(err) {
+							res.status(500).send(err);
+						} else {
+							users.forEach(function(user) {
+								me.factionsReceived.forEach(function(faction) {
+									if(user.id === faction.sender) {
+										faction.sender = user.username;
+									}
+								})
+							});
+							res.status(200).send(
+								{
+									username: me.username,
+									factionsSent: me.factions,
+									factionsReceived: me.factionsReceived,
+									friends: me.friends
+								}
+							);
+						}
+					});
+
+			})
+			.catch(function(err){
+				res.status(500).send(err);
+			});
+	},
+
+	factions: function(req, res) {
+		var userId = req.user.id;
+
+		User.findOne()
+			.where({id: req.user.id})
+			.populate("factionsReceived")
+			.populate("factions")
+			.then(function(me) {
+
+				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
+
+				User.find({id: senderIds})
+					.exec(function(err, users) {
+						if(err) {
+							res.status(500).send(err);
+						} else {
+							users.forEach(function(user) {
+								me.factionsReceived.forEach(function(faction) {
+									if(user.id === faction.sender) {
+										faction.sender = user.username;
+									}
+								})
+							});
+				
+							res.status(200).send(
+								{
+									sent: me.factions,
+									received: me.factionsReceived
+								}
+							);
+						}
+					});
+			})
+			.catch(function(err){
+				res.status(500).send(err);
+			});
+	},
+
 	friends: function(req, res){
 		var cb = function(err, user){
 			if (err){
@@ -60,12 +140,14 @@ module.exports = {
 		else {
 			var buildResponse = function(user){
 
-				var factions = user.pendingFactions || [];
+				// Get initial values
+				var pending_factions = user.pendingFactions || [];
 				var new_friends = user.newFriends || [];
 				var pending_requests = user.pendingFrom || [];
 				var response = [];
 
-				factions = factions.map(function(f){ 
+				// Map only important attributes
+				pending_factions = pending_factions.map(function(f){ 
 											return {
 												faction_id : f.id, 
 												sender : f.sender,
@@ -74,26 +156,34 @@ module.exports = {
 											}
 										});
 
+				// Map only the username
 				new_friends = new_friends.map(function(f){ return f.username; });
 				pending_requests = pending_requests.map(function(f){ return f.username; });
 
+
+				// Delete pendingFactions (the ones that weren't seen before)
 				user.pendingFactions.forEach(function(pendingFaction) {
 					user.pendingFactions.delete(pendingFaction.id);
 				});
 
+				// Delete "newFriends", now that we've noticed the user he's now friends with him
 				user.newFriends.forEach(function(newFriend) {
 					user.newFriends.delete(newFriend.id);
 				});
 
-				user.pendingFactions = [];
-				user.newFriends = [];
-				user.save();
+				// TODO SPRINT 2: RESPONSE
 
-				res.status(200).send({
-					factions 		 : factions,
-					new_friends 	 : new_friends,
-					pending_requests : pending_requests,
-					response    	 : response
+				user.save(function(err, user) {
+					if(err) {
+						res.status(500).send(err);
+					} else {
+						res.status(200).send({
+							factions 		 : pending_factions,
+							new_friends 	 : new_friends,
+							pending_requests : pending_requests,
+							response    	 : response
+						});
+					}
 				});
 			};
 
@@ -156,16 +246,32 @@ module.exports = {
 
 								friend.newFriends.add(myId);
 								friend.friends.add(myId);
-								me.save(function(err) {
-									friend.save(function(err) {
-										res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
-									});
+								me.save(function(err, user) {
+									if(err) {
+										res.status(500).send(err);
+									} else {
+										friend.save(function(err, user) {
+											if(err) {
+												res.status(500).send(err);
+											} else {
+												res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
+											}
+										});
+									}
 								});
 							} else {
-								me.save(function(err) {
-									friend.save(function(err) {
-										res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
-									});
+								me.save(function(err, user) {
+									if(err) {
+										res.status(500).send(err);
+									} else {
+										friend.save(function(err, user) {
+											if(err) {
+												res.status(500).send(err);
+											} else {
+												res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
+											}
+										});
+									}
 								});
 							}
 						}
@@ -197,10 +303,18 @@ module.exports = {
 			me.newFriends.add(friend.id);
 
 			// Save changes to database
-			friend.save(function(err){
-				me.save(function(err) {
-					res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'})
-				});
+			friend.save(function(err, user){
+				if(err) {
+					res.status(500).send(err);
+				} else {
+					me.save(function(err) {
+						if(err) {
+							res.status(500).send(err);
+						} else {
+							res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'});
+						}
+					});
+				}
 			});
 		};
 

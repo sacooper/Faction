@@ -5,7 +5,7 @@ module.exports = {
 
   attributes: {
     username  : { 
-    	type: 'string', 
+    	type: 'string',
     	unique: true 
     },
     email     : { 
@@ -72,7 +72,7 @@ module.exports = {
 	  			next(err);
 	  		}
 	  	});
-  	}
+  }
 };
 
 // module.exports = User;

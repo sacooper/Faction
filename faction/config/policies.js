@@ -42,19 +42,20 @@ module.exports.policies = {
   },
 
   UserController: {
-    search              : ['passport','sessionAuth'],
-    update              : ['passport','sessionAuth'],
-    addFriend           : ['passport','sessionAuth'],
-    acceptFriendRequest : ['passport','sessionAuth'],
-    friends             : ['passport','sessionAuth'],
+    search              : ['passport', 'sessionAuth'],
+    update              : ['passport', 'sessionAuth'],
+    addFriend           : ['passport', 'sessionAuth'],
+    acceptFriendRequest : ['passport', 'sessionAuth'],
+    friends             : ['passport', 'sessionAuth'],
+    getAllInfo          : ['passport', 'sessionAuth']
   },
 
   AuthController : {
-    logout              : ['passport','sessionAuth'],
-    updatepassword      : ['passport','sessionAuth'],
-    login               : ['passport','notLoggedIn'],
-    register            : ['passport','notLoggedIn'],
-    callback            : ['passport','notLoggedIn'],
+    logout              : ['passport', 'sessionAuth'],
+    updatepassword      : ['passport', 'sessionAuth'],
+    login               : ['passport', 'notLoggedIn'],
+    register            : ['passport', 'notLoggedIn'],
+    callback            : ['passport', 'notLoggedIn'],
   }
 
 
