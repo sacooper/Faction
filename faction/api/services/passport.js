@@ -197,7 +197,7 @@ passport.endpoint = function (req, res) {
   // login page
   if (!strategies.hasOwnProperty(provider)) {
     // return res.redirect('/login');
-    return res.json(error:"No provider");
+    return res.json({error:"No provider"});
   }
 
   // Attach scope if it has been set in the config
