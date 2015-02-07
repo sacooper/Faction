@@ -54,6 +54,14 @@
     - Something wierd happened
     - Error returned
 
+### Sending Response to a Faction
+#### /api/factions/respond
+- JSON object {fact}
+    - Considered true if fact set to "true", false otherwise
+- Success: 200 OK
+    - **Do we need request body here?**
+- Error: 403 forbidden - user not logged in
+
 ### Updating
 #### /api/update (GET)
 - Success: 200 OK
@@ -76,14 +84,6 @@
     - No Body, occurs on successful cration of friend request
 - Error: 403 Forbidden - user not logged in
 
-### Sending Response to a Faction
-#### /api/factions/respond
-- JSON object {fact}
-    - Considered true if fact set to "true", false otherwise
-- Success: 200 OK
-    - **Do we need request body here?**
-- Error: 403 forbidden - user not lgoged in
-
 ### Responding to a Friend Request
 #### /api/users/accept-friend (POST)
 - JSON object {username, accepted}
@@ -100,5 +100,31 @@
     - Body contains JSON object {friends : []}, containing list of usernames of user's friends
 - Error: 403 Forbidden 
     - user not logged in
+- Error: 500 Internal Server Error
+    - error returned
+
+### Getting all user information
+#### /api/user/friends (GET)
+- Success: 200 OK
+    - Body contains JSON object {friends: []}, the array contains username strings
+- Error: 500 Internal Server Error
+    - error returned
+
+### Getting all user information
+#### /api/user/info (GET)
+- Success: 200 OK
+    - Body contains JSON object {friends: [], factionsReceived: [], factionsSent: []}
+        - friends is an array of username strings
+        - factionsReceived is an array of {sender: username string,story,fact,id}
+        - factionsSent is an array of {sender: your user id,story,fact,id}
+- Error: 500 Internal Server Error
+    - error returned
+
+### Getting all factions related to user
+#### /api/user/factions (GET)
+- Success; 200 OK
+    - Body contains JSON object {sent: [], received: []}
+        - sent is an array of {sender: username string,story,fact,id}
+        - received is an array of {sender: your user id,story,fact,id}
 - Error: 500 Internal Server Error
     - error returned

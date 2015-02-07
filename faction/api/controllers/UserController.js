@@ -34,9 +34,23 @@ module.exports = {
 							res.status(200).send(
 								{
 									username: me.username,
-									factionsSent: me.factions,
-									factionsReceived: me.factionsReceived,
-									friends: me.friends
+									factionsSent: me.factions.map(function(faction) {
+										return {
+											sender: faction.sender,
+											story: faction.story,
+											fact: faction.fact,
+											id: faction.id
+										}
+									}),
+									factionsReceived: me.factionsReceived.map(function(faction) {
+										return {
+											sender: faction.sender,
+											story: faction.story,
+											fact: faction.fact,
+											id: faction.id
+										}
+									}),
+									friends: me.friends.map(function(user){return user.username;})
 								}
 							);
 						}
@@ -74,8 +88,22 @@ module.exports = {
 				
 							res.status(200).send(
 								{
-									sent: me.factions,
-									received: me.factionsReceived
+									sent: me.factions.map(function(faction) {
+										return {
+											sender: faction.sender,
+											story: faction.story,
+											fact: faction.fact,
+											id: faction.id
+										}
+									}),
+									received: me.factionsReceived.map(function(faction) {
+										return {
+											sender: faction.sender,
+											story: faction.story,
+											fact: faction.fact,
+											id: faction.id
+										}
+									})
 								}
 							);
 						}
