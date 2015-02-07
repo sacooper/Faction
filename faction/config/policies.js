@@ -47,7 +47,8 @@ module.exports.policies = {
     addFriend           : ['passport', 'sessionAuth'],
     acceptFriendRequest : ['passport', 'sessionAuth'],
     friends             : ['passport', 'sessionAuth'],
-    getAllInfo          : ['passport', 'sessionAuth']
+    getAllInfo          : ['passport', 'sessionAuth'],
+    factions          : ['passport', 'sessionAuth']
   },
 
   AuthController : {
