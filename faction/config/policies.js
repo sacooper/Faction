@@ -46,6 +46,7 @@ module.exports.policies = {
     update              : ['passport','sessionAuth'],
     addFriend           : ['passport','sessionAuth'],
     acceptFriendRequest : ['passport','sessionAuth'],
+    friends             : ['passport','sessionAuth'],
   },
 
   AuthController : {
