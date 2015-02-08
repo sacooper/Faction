@@ -188,15 +188,14 @@ module.exports = {
 				new_friends = new_friends.map(function(f){ return f.username; });
 				pending_requests = pending_requests.map(function(f){ return f.username; });
 
-
 				// Delete pendingFactions (the ones that weren't seen before)
 				user.pendingFactions.forEach(function(pendingFaction) {
-					user.pendingFactions.delete(pendingFaction.id);
+					user.pendingFactions.remove(pendingFaction.id);
 				});
 
 				// Delete "newFriends", now that we've noticed the user he's now friends with him
 				user.newFriends.forEach(function(newFriend) {
-					user.newFriends.delete(newFriend.id);
+					user.newFriends.remove(newFriend.id);
 				});
 
 				// TODO SPRINT 2: RESPONSE
@@ -265,8 +264,8 @@ module.exports = {
 						// Otherwise proceed and add him to friends
 						else {
 
-							me.pendingTo.remove(friend.id);
-							friend.pendingFrom.remove(myId);
+							friend.pendingTo.remove(myId);
+							me.pendingFrom.remove(friend.id);
 
 							if(accepted) {
 								me.newFriends.add(friend.id);
