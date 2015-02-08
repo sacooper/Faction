@@ -45,16 +45,20 @@ module.exports = {
 				.exec(function(err, users) {
 				
 				if(err) {
-					sails.log(err);
 					res.status(500).send({error: "failure"});
 				}
 
+				console.log("start", users);
+
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
+					console.log(user);
 					if (_.some(user.friends, function(friend){ return friend.id === sender.id; })){
 						recipients.push(user); 
 					}
 				});
+
+				console.log("after friend check", users);
 
 				if(recipients.length === 0) {
 					res.status(400).send({error: "No valid recipients sent"});
@@ -76,19 +80,27 @@ module.exports = {
 					fact : actual_fact
 				}, function(err, faction) {
 					if (err){	
-						sails.log(err);
 						res.status(500).send(err); 
 					} else {
+
+						console.log("Faction created", users);
+
+						var counter = 0;
+
 						recipients.forEach(function(user){
 							user.pendingFactions.add(faction);
 							user.factionsReceived.add(faction);
 							user.save(function(err) {
 								if(err) {
-									sails.log(err);
 									res.status(500).send(err);
 								}
+								console.log("Step " + counter, users);
+								counter++;
 							});
 						});
+
+						console.log("Leaving with 201", users);
+						
 						res.status(201).send({message: 'Faction successfully sent.'});
 					}
 				});
