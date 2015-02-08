@@ -16,8 +16,10 @@ module.exports = {
 	create: function(req, res){
 
 		var printFriends = function(user) {
-			var friendlist = user.friends.map(function(friend) {return friend.username});
-			console.log(user.username + " is friends with: " + friendlist + "\n");
+			User.findOne({username: user.username})
+				.populate("friends")
+				.then(function(user) {console.log(user.username + " -> " + user.friends.map(function(friend){return friend.username;}) + "\n")})
+				.catch(function(err) {console.log("gg")});
 		};
 
 		var sender = req.user;
@@ -54,7 +56,7 @@ module.exports = {
 				}
 
 				console.log("START:\n");
-				users.map(printFriends);
+				users.forEach(printFriends);
 
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
@@ -64,11 +66,12 @@ module.exports = {
 				});
 
 				console.log("AFTER FRIEND CHECK:\n");
-				users.map(printFriends);
+				recipients.forEach(printFriends);
 
 				if(recipients.length === 0) {
 					res.status(400).send({error: "No valid recipients sent"});
 				}
+
 
 				var actual_fact = false; // default value, TODO: Check this
 
@@ -90,7 +93,7 @@ module.exports = {
 					} else {
 
 						console.log("FACTION CREATE:\n");
-						users.map(printFriends);
+						users.forEach(printFriends);
 
 						var counter = 0;
 
@@ -102,13 +105,13 @@ module.exports = {
 									res.status(500).send(err);
 								}
 								console.log("STEP " + counter + "\n");
-								users.map(printFriends);
+								recipients.forEach(printFriends);
 								counter++;
 							});
 						});
 
 						console.log("Leaving with 201\n");
-						users.map(printFriends);
+						recipients.forEach(printFriends);
 						res.status(201).send({message: 'Faction successfully sent.'});
 					}
 				});
