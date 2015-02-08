@@ -21,7 +21,8 @@ module.exports = {
       via: 'recipients'
     },
     pendingFactions : {
-      collection: 'faction'
+      collection: 'faction',
+      via: 'unreadBy'
     },
     newFriends : {
     	collection: 'user'
