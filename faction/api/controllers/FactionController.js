@@ -80,8 +80,8 @@ module.exports = {
 				}
 
 				Faction.create({
-					sender : sender,
-					recipients : recipients,
+					sender : sender.id,
+					recipients : recipients.map(function(rec) {return rec.id;}),
 					comments : [],
 					trueResponses : 0,
 					falseResponses : 0,
