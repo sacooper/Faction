@@ -77,7 +77,7 @@
     - Error returned
 
 ### Sending a Friend Request
-#### /api/users/request-friend (POST)
+#### /api/user/request-friend (POST)
 - JSON object {username}
     - Friend contains username of person to request
 - Success: 201 Created
@@ -85,7 +85,7 @@
 - Error: 403 Forbidden - user not logged in
 
 ### Responding to a Friend Request
-#### /api/users/accept-friend (POST)
+#### /api/user/accept-friend (POST)
 - JSON object {username, accepted}
     - Friend contains username of person accepting
     - Will accept if accepted is true, assumed false otherwise
