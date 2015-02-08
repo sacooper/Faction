@@ -15,6 +15,11 @@ module.exports = {
 	/** Creation of a faction **/
 	create: function(req, res){
 
+		var printFriends = function(user) {
+			var friendlist = user.friends.map(function(friend) {return friend.username});
+			console.log(user.username + " is friends with: " + friendlist + "\n");
+		};
+
 		var sender = req.user;
 
 		var to = req.param('to');
@@ -48,17 +53,18 @@ module.exports = {
 					res.status(500).send({error: "failure"});
 				}
 
-				console.log("start", users);
+				console.log("START:\n");
+				users.map(printFriends);
 
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
-					console.log(user);
 					if (_.some(user.friends, function(friend){ return friend.id === sender.id; })){
 						recipients.push(user); 
 					}
 				});
 
-				console.log("after friend check", users);
+				console.log("AFTER FRIEND CHECK:\n");
+				users.map(printFriends);
 
 				if(recipients.length === 0) {
 					res.status(400).send({error: "No valid recipients sent"});
@@ -83,7 +89,8 @@ module.exports = {
 						res.status(500).send(err); 
 					} else {
 
-						console.log("Faction created", users);
+						console.log("FACTION CREATE:\n");
+						users.map(printFriends);
 
 						var counter = 0;
 
@@ -94,13 +101,14 @@ module.exports = {
 								if(err) {
 									res.status(500).send(err);
 								}
-								console.log("Step " + counter, users);
+								console.log("STEP " + counter + "\n");
+								users.map(printFriends);
 								counter++;
 							});
 						});
 
-						console.log("Leaving with 201", users);
-						
+						console.log("Leaving with 201\n");
+						users.map(printFriends);
 						res.status(201).send({message: 'Faction successfully sent.'});
 					}
 				});
