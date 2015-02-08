@@ -22,6 +22,7 @@ module.exports = {
 				User.find({id: senderIds})
 					.exec(function(err, users) {
 						if(err) {
+							sails.log(err);
 							res.status(500).send(err);
 						} else {
 							users.forEach(function(user) {
@@ -58,6 +59,7 @@ module.exports = {
 
 			})
 			.catch(function(err){
+				sails.log(err);
 				res.status(500).send(err);
 			});
 	},
@@ -76,6 +78,7 @@ module.exports = {
 				User.find({id: senderIds})
 					.exec(function(err, users) {
 						if(err) {
+							sails.log(err);
 							res.status(500).send(err);
 						} else {
 							users.forEach(function(user) {
@@ -110,6 +113,7 @@ module.exports = {
 					});
 			})
 			.catch(function(err){
+				sails.log(err);
 				res.status(500).send(err);
 			});
 	},
@@ -117,6 +121,7 @@ module.exports = {
 	friends: function(req, res){
 		var cb = function(err, user){
 			if (err){
+				sails.log(err);
 				res.status(500).send(err);
 			} else {
 				var friends = user.friends.map(function(f){return f.username;});
@@ -202,6 +207,7 @@ module.exports = {
 
 				user.save(function(err, user) {
 					if(err) {
+						sails.log(err);
 						res.status(500).send(err);
 					} else {
 						res.status(200).send({
@@ -220,7 +226,9 @@ module.exports = {
 				.populate('newFriends')
 				.populate('pendingFrom')
 				.then(buildResponse)
-				.catch(function(err) { res.status(500).send(err) });
+				.catch(function(err) { 
+					sails.log(err);
+					res.status(500).send(err); });
 		}
 	},
 
@@ -232,6 +240,7 @@ module.exports = {
 		var myId = req.user.id;
 
 		var addFriendError = function(err) {
+			sails.log(err);
 			return res.status(500).send(err);
 		};
 
@@ -275,10 +284,12 @@ module.exports = {
 								friend.friends.add(myId);
 								me.save(function(err, user) {
 									if(err) {
+										sails.log(err);
 										res.status(500).send(err);
 									} else {
 										friend.save(function(err, user) {
 											if(err) {
+												sails.log(err);
 												res.status(500).send(err);
 											} else {
 												res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
@@ -289,10 +300,12 @@ module.exports = {
 							} else {
 								me.save(function(err, user) {
 									if(err) {
+										sails.log(err);
 										res.status(500).send(err);
 									} else {
 										friend.save(function(err, user) {
 											if(err) {
+												sails.log(err);
 												res.status(500).send(err);
 											} else {
 												res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
@@ -312,6 +325,7 @@ module.exports = {
 		var myId = req.user.id;
 
 		var requestError = function(err) {
+			sails.log(err);
 			res.status(500).send(err);
 		};
 
@@ -332,10 +346,12 @@ module.exports = {
 			// Save changes to database
 			friend.save(function(err, user){
 				if(err) {
+					sails.log(err);
 					res.status(500).send(err);
 				} else {
 					me.save(function(err) {
 						if(err) {
+							sails.log(err);
 							res.status(500).send(err);
 						} else {
 							res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'});
@@ -388,10 +404,12 @@ module.exports = {
 
 								friend.save(function(err) {
 									if(err) {
+										sails.log(err);
 										res.status(500).send(err);
 									} else {
 										me.save(function(err) {
 											if(err) {
+												sails.log(err);
 												res.status(500).send(err);
 											} else {
 												res.status(200).send({message: "Successfully posted a friend request"});
