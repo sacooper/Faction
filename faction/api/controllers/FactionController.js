@@ -87,7 +87,7 @@ module.exports = {
 					falseResponses : 0,
 					story : faction,
 					fact : actual_fact
-				}, function(err, faction) {
+				}).exec(function(err, faction) {
 					if (err){	
 						res.status(500).send(err); 
 					} else {
