@@ -45,12 +45,12 @@ module.exports = {
 				.exec(function(err, users) {
 				
 				if(err) {
+					sails.log(err);
 					res.status(500).send({error: "failure"});
 				}
 
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
-					console.log(user);
 					if (_.some(user.friends, function(friend){ return friend.id === sender.id; })){
 						recipients.push(user); 
 					}
@@ -76,6 +76,7 @@ module.exports = {
 					fact : actual_fact
 				}, function(err, faction) {
 					if (err){	
+						sails.log(err);
 						res.status(500).send(err); 
 					} else {
 						recipients.forEach(function(user){
@@ -83,6 +84,7 @@ module.exports = {
 							user.factionsReceived.add(faction);
 							user.save(function(err) {
 								if(err) {
+									sails.log(err);
 									res.status(500).send(err);
 								}
 							});
