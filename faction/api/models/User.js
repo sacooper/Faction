@@ -17,7 +17,8 @@ module.exports = {
       via: 'sender'
     },
     factionsReceived : {
-      collection: 'faction'
+      collection: 'faction',
+      via: 'recipients'
     },
     pendingFactions : {
       collection: 'faction'
@@ -34,7 +35,10 @@ module.exports = {
     friends : {
     	collection: 'user'
     },
-    passports : { collection: 'Passport', via: 'user' }
+    passports : { 
+      collection: 'Passport', 
+      via: 'user' 
+    }
   },
 
   /**

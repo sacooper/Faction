@@ -12,7 +12,9 @@ module.exports = {
         model: 'user'
     },
     recipients: {
-    	collection: 'user'
+    	collection: 'user',
+        via: 'factionsReceived',
+        dominant: true
     },
     comments : {
     	collection: 'comment',

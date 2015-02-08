@@ -15,8 +15,8 @@ module.exports = {
 	/** Creation of a faction **/
 	create: function(req, res){
 
-		var printFriends = function(user) {
-			User.findOne({username: user.username})
+		var printFriends = function(id) {
+			User.findOne({id: id})
 				.populate("friends")
 				.then(function(user) {console.log(user.username + " -> " + user.friends.map(function(friend){return friend.username;}) + "\n")})
 				.catch(function(err) {console.log("gg")});
@@ -27,7 +27,7 @@ module.exports = {
 		var to = req.param('to');
 		var faction = req.param('faction');
 		var fact = req.param('fact');
-		var recipients = [];
+		var recipientIds = [];
 
 		if (!sender){
 			res.status(400).send({error: "No sender included"});
@@ -56,19 +56,18 @@ module.exports = {
 				}
 
 				console.log("START:\n");
-				users.forEach(printFriends);
 
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
 					if (_.some(user.friends, function(friend){ return friend.id === sender.id; })){
-						recipients.push(user); 
+						recipientIds.push(user.id); 
 					}
 				});
 
 				console.log("AFTER FRIEND CHECK:\n");
-				recipients.forEach(printFriends);
+				recipientIds.forEach(printFriends);
 
-				if(recipients.length === 0) {
+				if(recipientIds.length === 0) {
 					res.status(400).send({error: "No valid recipients sent"});
 				}
 
@@ -81,7 +80,7 @@ module.exports = {
 
 				Faction.create({
 					sender : sender.id,
-					recipients : recipients.map(function(rec) {return rec.id;}),
+					recipients : recipientIds,
 					comments : [],
 					trueResponses : 0,
 					falseResponses : 0,
@@ -91,28 +90,38 @@ module.exports = {
 					if (err){	
 						res.status(500).send(err); 
 					} else {
-
+						
 						console.log("FACTION CREATE:\n");
-						users.forEach(printFriends);
+						recipientIds.forEach(printFriends);
 
-						var counter = 0;
-
-						recipients.forEach(function(user){
-							user.pendingFactions.add(faction);
-							user.factionsReceived.add(faction);
-							user.save(function(err) {
-								if(err) {
-									res.status(500).send(err);
-								}
-								console.log("STEP " + counter + "\n");
-								recipients.forEach(printFriends);
-								counter++;
-							});
-						});
-
-						console.log("Leaving with 201\n");
-						recipients.forEach(printFriends);
 						res.status(201).send({message: 'Faction successfully sent.'});
+
+						// console.log("FACTION CREATE:\n");
+						// recipientIds.forEach(printFriends);
+
+						// User.find({id: recipientIds})
+						// 	.populate('pendingFactions')
+						// 	.populate('factionsReceived')
+						// 	.exec(function(err, recipients) {
+						// 		if(err) {
+						// 			res.status(500).send(err);
+						// 		} else {
+						// 			var counter = 0;
+						// 			recipients.forEach(function(user){
+						// 				user.pendingFactions.add(faction.id);
+						// 				user.factionsReceived.add(faction.id);
+						// 				user.save(function(err) {
+						// 					if(err) {
+						// 						res.status(500).send(err);
+						// 					}
+						// 					console.log("STEP " + counter + "\n");
+						// 					recipientIds.forEach(printFriends);
+						// 					counter++;
+						// 				});
+						// 			});
+						// 		}
+						// 	});
+
 					}
 				});
 
