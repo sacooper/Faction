@@ -52,7 +52,7 @@ module.exports.policies = {
   },
 
   AuthController : {
-    logout              : ['passport', 'sessionAuth'],
+    logout              : ['passport'],
     updatepassword      : ['passport', 'sessionAuth'],
     login               : ['passport', 'notLoggedIn'],
     register            : ['passport', 'notLoggedIn'],
