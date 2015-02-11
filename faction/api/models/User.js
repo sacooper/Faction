@@ -17,10 +17,12 @@ module.exports = {
       via: 'sender'
     },
     factionsReceived : {
-      collection: 'faction'
+      collection: 'faction',
+      via: 'recipients'
     },
     pendingFactions : {
-      collection: 'faction'
+      collection: 'faction',
+      via: 'unreadBy'
     },
     newFriends : {
     	collection: 'user'
@@ -34,7 +36,10 @@ module.exports = {
     friends : {
     	collection: 'user'
     },
-    passports : { collection: 'Passport', via: 'user' }
+    passports : { 
+      collection: 'Passport', 
+      via: 'user' 
+    }
   },
 
   /**

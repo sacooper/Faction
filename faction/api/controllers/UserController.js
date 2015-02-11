@@ -276,7 +276,7 @@ module.exports = {
 							friend.pendingTo.remove(myId);
 							me.pendingFrom.remove(friend.id);
 
-							if(accepted) {
+							if(accepted === "true") {
 								me.newFriends.add(friend.id);
 								me.friends.add(friend.id);
 

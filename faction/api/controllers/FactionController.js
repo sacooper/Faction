@@ -20,7 +20,7 @@ module.exports = {
 		var to = req.param('to');
 		var faction = req.param('faction');
 		var fact = req.param('fact');
-		var recipients = [];
+		var recipientIds = [];
 
 		if (!sender){
 			res.status(400).send({error: "No sender included"});
@@ -45,20 +45,21 @@ module.exports = {
 				.exec(function(err, users) {
 				
 				if(err) {
-					sails.log(err);
+					console.log(err);
 					res.status(500).send({error: "failure"});
 				}
 
 				// Verify if recipient and sender are friends
 				users.forEach(function(user) {
 					if (_.some(user.friends, function(friend){ return friend.id === sender.id; })){
-						recipients.push(user); 
+						recipientIds.push(user.id); 
 					}
 				});
 
-				if(recipients.length === 0) {
+				if(recipientIds.length === 0) {
 					res.status(400).send({error: "No valid recipients sent"});
 				}
+
 
 				var actual_fact = false; // default value, TODO: Check this
 
@@ -67,38 +68,25 @@ module.exports = {
 				}
 
 				Faction.create({
-					sender : sender,
-					recipients : recipients,
+					sender : sender.id,
+					recipients : recipientIds,
+					unreadBy: recipientIds,
 					comments : [],
 					trueResponses : 0,
 					falseResponses : 0,
 					story : faction,
 					fact : actual_fact
-				}, function(err, faction) {
+				}).exec(function(err, faction) {
 					if (err){	
-						sails.log(err);
+						console.log(err);
 						res.status(500).send(err); 
 					} else {
-						recipients.forEach(function(user){
-							user.pendingFactions.add(faction);
-							user.factionsReceived.add(faction);
-							user.save(function(err) {
-								if(err) {
-									sails.log(err);
-									res.status(500).send(err);
-								}
-							});
-						});
 						res.status(201).send({message: 'Faction successfully sent.'});
 					}
 				});
 
 			});
 		}
-
-		
-
-
 	}
 };
 
