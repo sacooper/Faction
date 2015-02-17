@@ -1,6 +1,8 @@
 # Faction API
 - All POST, PUT bodies contain JSON objects
 - ":id" signifies ID of user
+- (1) means it is sent only once
+- (*) means it is sent as long as no action takes place to change it
 
 ## Account Management
 ### Create an Account
@@ -38,7 +40,7 @@
 - Success:200 OK
 - Error: 403 Forbidden
 
-## General Usage
+## Faction
 ### Sending a faction
 #### /api/factions/send (POST)
 - JSON object {to:[], faction, fact}
@@ -62,20 +64,57 @@
     - **Do we need request body here?**
 - Error: 403 forbidden - user not logged in
 
-### Updating
-#### /api/update (GET)
+## User info flow and update control
+### Getting all user information
+#### /api/user/info (GET)
 - Success: 200 OK
-    - Body contains {factions:[], new_friends:[], pending_requests:[], responses[{faction_id, response}]}
-    - factions: Empty list if no new factions, otherwise list of {faction_id, story, sender, fact}
-    - new_friends: Empty list if no new friends (i.e. pending friend requests that have been approved), otherwise, list of usernames with approved friends
-    - pending_requests: Empty list if no new pending requests, otherwise, list contains usernames of people who requested to be this person's friend
-    - Should subsequently send GET request to /api/factions/get?id=...&faction_id=... to get factions
+- Body contains JSON object {friends: [], receivedFriendRequests: [], acceptedFriendRequests: [], factionsReceived: [], factionsSent: [], pendingFactions: [], factionResponses: [], updateTimestamp}
+    - friends(*) is an array of username strings of all your friends (includes acceptedFriendRequests)
+    - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
+    - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
+    - factionsReceived(*) is an array of {sender, story, fact, factionId}
+    - factionsSent(*) is an array of {sender, story, fact, factionId}
+    - pendingFactions(*) is an array of {sender, story, fact, factionId}
+        - sender is a username string
+        - story is a string
+        - fact is a boolean
+        - factionId is string
+    - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
+        - factionId is a string
+        - responderUsername is a string
+        - response is a boolean
+    - updateTimestamp(*) is a string containing a date
+
+- Error: 500 Internal Server Error
+    - error returned
+
+### Updating
+#### /api/user/update (POST)
+- Body of request contains {updateTimestamp, viewedFactions: []}
+    - updateTimestamp is string identical sent in the last /api/user/info or /api/user/update
+    - viewedFactions is an array of faction IDs from pendingFactions that were seen by the user
+- Success: 200 OK
+- Body contains {receivedFriendRequests: [], acceptedFriendRequests: [], pendingFactions: [], factionResponses: [], updateTimestamp}
+    - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
+    - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
+    - pendingFactions(*) is an array of {sender, story, fact, factionId}
+        - sender is a username string
+        - story is a string
+        - fact is a boolean
+        - factionId is string
+    - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
+        - factionId is a string
+        - responderUsername is a string
+        - response is a boolean
+    - updateTimestamp(*) is a string containing a date
+
 - Error: 400 Bad Request
     - Something wrong with the user's session
 - Error: 500 Internal Server Error
     - Something wierd happened
     - Error returned
 
+## Friends
 ### Sending a Friend Request
 #### /api/user/request-friend (POST)
 - JSON object {username}
@@ -92,6 +131,7 @@
 - Success: 200 OK
 - Error: 403 Forbidden - user not logged in
 
+## User utilities
 ### Searching for Users
 #### /api/user/search (GET)
 - Optional query parameter search=""
@@ -106,19 +146,9 @@
 ### Getting user's friends
 #### /api/user/friends (GET)
 - Success: 200 OK
-    - Body contains JSON object {friends: []}, the array contains username strings
+- Body contains JSON object {friends: []}, the array contains username strings
 - Error: 500 Internal Server Error
-    - error returned
-
-### Getting all user information
-#### /api/user/info (GET)
-- Success: 200 OK
-    - Body contains JSON object {friends: [], factionsReceived: [], factionsSent: []}
-        - friends is an array of username strings
-        - factionsReceived is an array of {sender: username string,story,fact,id}
-        - factionsSent is an array of {sender: your user id,story,fact,id}
-- Error: 500 Internal Server Error
-    - error returned
+- error returned
 
 ### Getting all factions related to user
 #### /api/user/factions (GET)
