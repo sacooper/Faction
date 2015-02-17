@@ -75,6 +75,8 @@
     - factionsReceived(*) is an array of {sender, story, fact, factionId}
     - factionsSent(*) is an array of {sender, story, fact, factionId}
     - pendingFactions(*) is an array of {sender, story, fact, factionId}
+
+        For factionsReceived, factionsSent and pendingFactions
         - sender is a username string
         - story is a string
         - fact is a boolean
