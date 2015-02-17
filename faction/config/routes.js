@@ -44,26 +44,19 @@ module.exports.routes = {
   'post /api/factions/send'         : 'FactionController.create',
   'post /api/factions/respond'      : 'FactionController.respond',
 
-  /** User related routes **/
-  'get /api/update'                 : 'UserController.update',
+  /** User info flow and update control routes **/
+  'get  /api/user/info'              : 'UserController.getAllInfo',
+  'post /api/user/update'            : 'UserController.update',
 
-  /** Sending a frient request **/
+  /** Frient request routes **/
   'post /api/user/request-friend'   : 'UserController.addFriend',
-
-  /** Response to a friend request **/
   'post /api/user/accept-friend'    : 'UserController.acceptFriendRequest',
 
-  /** Get all users**/
+  /** User utilities **/
   'get /api/user/search'            : 'UserController.search',
-
-  /** Get a user's friends **/
-  'get /api/user/friends'           : 'UserController.friends',  
-
-  /** Get a user's friends **/
+  'get /api/user/friends'           : 'UserController.friends', 
   'get /api/user/factions'          : 'UserController.factions',
 
-  /** Get a user's full information **/
-  'get /api/user/info'              : 'UserController.getAllInfo',
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
