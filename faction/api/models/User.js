@@ -12,7 +12,7 @@ module.exports = {
     	type: 'email',  
     	unique: true 
     },
-    factions  : {
+    factionsSent  : {
     	collection: 'faction',
       via: 'sender'
     },
@@ -21,17 +21,20 @@ module.exports = {
       via: 'recipients'
     },
     pendingFactions : {
-      collection: 'faction',
-      via: 'unreadBy'
+      collection: 'pendingFaction',
+      via: 'recipient'
     },
     newFriends : {
-    	collection: 'user'
+    	collection: 'acceptedFriendRequest',
+      via: 'sender'
     },
-    pendingTo  : {
-      collection: 'user'
+    pendingTo  : {  // Friend requests this user recieved
+      collection: 'pendingFriendRequest',
+      via: 'recipient'
     },
-    pendingFrom : {
-    	collection: 'user'
+    pendingFrom : { // Friend Requests this user sent
+    	collection: 'pendingFriendRequest',
+      via: 'sender'
     },
     friends : {
     	collection: 'user'
@@ -39,6 +42,9 @@ module.exports = {
     passports : { 
       collection: 'Passport', 
       via: 'user' 
+    },
+    lastUpdate : {
+      type: 'datetime'
     }
   },
 
@@ -77,7 +83,19 @@ module.exports = {
 	  			next(err);
 	  		}
 	  	});
+  },
+
+  findFriends: function(user, next){
+    User.findOne()
+      .where({username: user.username})
+      .populate('friends')
+      .exec(next);
+  },
+
+  search: function(str, next){
+    User.find({username: {'contains': str}}).exec(next);
   }
+
 };
 
 // module.exports = User;

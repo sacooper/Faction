@@ -14,7 +14,7 @@ module.exports = {
 			.where({id: req.user.id})
 			.populate("friends")
 			.populate("factionsReceived")
-			.populate("factions")
+			.populate("factionsSent")
 			.then(function(me) {
 
 				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
@@ -70,7 +70,7 @@ module.exports = {
 		User.findOne()
 			.where({id: req.user.id})
 			.populate("factionsReceived")
-			.populate("factions")
+			.populate("factionsSent")
 			.then(function(me) {
 
 				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
@@ -129,41 +129,24 @@ module.exports = {
 			}
 		}
 
-		var user = User.findOne()
-			.where({id : req.user.id})
-			.populate('friends')
-			.exec(cb);
-
+		User.findFriends(req.user, cb);
 	},
 
 	search: function(req, res){
-		var str = req.param('search');
+		var str = req.param('search') || "";
 
-		if (str) {
-			// If string is defined, find usernames that contain that string
-			User.find({username : {'contains' : str}}).exec(function(err, users){
-				if (err) {
-					sails.log(err);
-					res.status(500).send(err);
-				} else {
-					res.status(200).send(users
-						.filter(function(u) { return !_.isUndefined(u.username); })
-						.map(function(u) { return u.username; }));
-				}
-			});
-		} else {
-			// Otherwise return all usernames
-			User.find().exec(function (err, users) {
-				if (err) {
-					sails.log(err);
-					res.status(500).send(err);
-				} else {
-					res.status(200).send(users
-						.filter(function(u){ return !_.isUndefined(u.username); })
-						.map(function(u){ return u.username;}));
-				}
-			});
-		}
+		var next = function(err, users){
+			if (err) {
+				sails.log(err);
+				res.status(500).send(err);
+			} else {
+				res.status(200).send(users
+					.filter(function(u) { return !_.isUndefined(u.username); })
+					.map(function(u) { return u.username; }));
+			}
+		};
+
+		User.search(str, next);
 	},
 
 	update: function(req, res){

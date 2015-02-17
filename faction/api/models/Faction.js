@@ -16,10 +16,9 @@ module.exports = {
         via: 'factionsReceived',
         dominant: true
     },
-    unreadBy: {
-        collection: 'user',
-        via: 'pendingFactions',
-        dominant: true
+    unreadStatus: {
+        collection: 'pendingFaction',
+        via: 'faction'
     }, 
     comments : {
     	collection: 'comment',
