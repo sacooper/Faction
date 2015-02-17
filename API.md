@@ -81,7 +81,7 @@
         - factionId is string
     - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
         - factionId is a string
-        - responderUsername is a string
+        - responderUsername is a string (TODO: check, maybe only send counts for fact/fiction)
         - response is a boolean
     - updateTimestamp(*) is a string containing a date
 

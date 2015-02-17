@@ -13,50 +13,91 @@ module.exports = {
 		User.findOne()
 			.where({id: req.user.id})
 			.populate("friends")
+			.populate("pendingReceivedRequests")
+			.populate("newFriends")
 			.populate("factionsReceived")
 			.populate("factionsSent")
+			.populate("pendingFactions")
 			.then(function(me) {
 
-				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
+				// Ids of pending friend request users
+				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.recipient; });
 
-				User.find({id: senderIds})
-					.exec(function(err, users) {
-						if(err) {
-							sails.log(err);
-							res.status(500).send(err);
-						} else {
-							users.forEach(function(user) {
-								me.factionsReceived.forEach(function(faction) {
-									if(user.id === faction.sender) {
-										faction.sender = user.username;
-									}
-								})
-							});
-							res.status(200).send(
-								{
-									username: me.username,
-									factionsSent: me.factions.map(function(faction) {
-										return {
-											sender: faction.sender,
-											story: faction.story,
-											fact: faction.fact,
-											id: faction.id
-										}
-									}),
-									factionsReceived: me.factionsReceived.map(function(faction) {
-										return {
-											sender: faction.sender,
-											story: faction.story,
-											fact: faction.fact,
-											id: faction.id
-										}
-									}),
-									friends: me.friends.map(function(user){return user.username;})
-								}
-							);
-						}
+				// Ids of the new friends recently made
+				var newFriendsIds = me.newFriends.map(function(f){ return f.newFriend; });
+
+				// Ids of the factions Received
+				var factionReceivedIds = me.factionsReceived.map(function(f){ return f.id; });
+			
+				// Ids of the factions Sent
+				var factionSentIds = me.factionsSent.map(function(f){ return f.id; });
+				
+				// Ids of the pending factions
+				var factionIds = me.pendingFactions.map(function(f){ return f.faction; });
+
+				// Array of friend username
+				var friends = _.pluck(me.friends, 'username');
+
+				var pendingUsers = User.find({
+						id: pendingReceivedRequestsIds
+					}).then(function(pendingFriend) {
+						return pendingFriend;
 					});
 
+				var newFriends = User.find({
+						id: newFriendsIds
+					}).then(function(newFriends) {
+						return newFriends;
+					});
+
+				var factionsReceived = Faction.find({
+						id: factionReceivedIds
+					})
+					.populate('sender')
+					.then(function(factionsReceived) {
+						return factionsReceived;
+					});
+
+				var factionsSent = Faction.find({
+						id: factionSentIds
+					})
+					.populate('sender')
+					.then(function(factionsSent) {
+						return factionsSent;
+					});
+
+				var pendingFactions = Faction.find({
+						id: factionIds
+					})
+					.populate('sender')
+					.then(function(pendingFactions) {
+						return pendingFactions;
+					});
+
+				// TODO:
+				var responses = [];
+
+				// FIXME: toString? defaultsTo in model?
+				var updateTimestamp = me.lastUpdate;
+
+				return [friends, pendingUsers, newFriends, 
+							factionsReceived, factionsSent, pendingFactions,
+							responses, updateTimestamp];
+
+			})
+			.spread(function(friends, pendingUsers, newFriends, 
+								factionsReceived, factionsSent, pendingFactions,
+								responses, updateTimestamp) {
+
+				console.log(friends);
+				console.log(pendingUsers);
+				console.log(newFriends);
+				console.log(factionsReceived);
+				console.log(factionsSent);
+				console.log(pendingFactions);
+				console.log(responses);
+				console.log(updateTimestamp);
+				res.status(200).send("got here");
 			})
 			.catch(function(err){
 				sails.log(err);
@@ -344,18 +385,95 @@ module.exports = {
 			});
 		};
 
+		// Get all friend information
+		// Spread
+		// Get all my information
+		// Spread
+		// Save appropriate models accordingly
+
 		User.findOne()
 			.where({username: friendUsername})
-			.populate('pendingFrom')
-			.populate('pendingTo')
+			.populate('pendingReceivedRequests')
+			.populate('pendingSentRequests')
+			.populate('friends')
+			.populate('newFriends')
+			.then(function(friend) {
+
+				// Get all friend information and spread it
+
+				var friendReceivedFromUsers = User.find({
+					id: _.pluck(friend.pendingReceivedRequests, 'sender')
+				}).then(function(users){
+					return users;
+				});
+
+				var friendSentToUsers = User.find({
+					id: _.pluck(friend.pendingSentRequests, 'recipient')
+				}).then(function(users){
+					return users;
+				})
+
+				return [friend, friendReceivedFromUsers, friendSentToUsers];
+
+			})
+			.spread(function(friend, friendReceivedFromUsers, friendSentToUsers) {
+				User.findOne()
+					.where({id: myId})
+					.populate('pendingReceivedRequests')
+					.populate('pendingSentRequests')
+					.populate('friends')
+					.populate('newFriends')
+					.then(function(me) {
+
+						// Get all my information and spread it
+
+						var meReceivedFromUsers = User.find({
+							id: _.pluck(me.pendingReceivedRequests, 'sender')
+						}).then(function(users){
+							return users;
+						});
+
+						var meSentToUsers = User.find({
+							id: _.pluck(me.pendingSentRequests, 'recipient')
+						}).then(function(users){
+							return users;
+						})
+
+						return [friend, friendReceivedFromUsers, friendSentToUsers,
+								me, meReceivedFromUsers, meSentToUsers];
+
+					})
+					.spread(function(friend, friendReceivedFromUsers, friendSentToUsers,
+								me, meReceivedFromUsers, meSentToUsers) {
+							
+							console.log(friend);
+							console.log(friendReceivedFromUsers);
+							console.log(friendSentToUsers);
+							console.log(me);
+							console.log(meReceivedFromUsers);
+							console.log(meSentToUsers);
+							res.status(200).send('got here');
+
+							if(me.id === friend.id) {
+								res.status(200).send({error: 'You cannot add yourself.'});
+							}
+						// logic happens here
+
+					}).catch(requestError);
+			}).catch(requestError);
+
+		User.findOne()
+			.where({username: friendUsername})
+			.populate('pendingReceivedRequests')
+			.populate('pendingSentRequests')
 			.populate('friends')
 			.populate('newFriends')
 			.then(function(friend) {
 
 				User.findOne()
 					.where({id: myId})
-					.populate('pendingFrom')
-					.populate('pendingTo')
+					.populate('pendingReceivedRequests')
+					.populate('pendingSentRequests')
 					.populate('friends')
 					.populate('newFriends')
 					.then(function(me) {

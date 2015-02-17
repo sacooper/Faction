@@ -44,7 +44,8 @@ module.exports = {
       via: 'user' 
     },
     lastUpdate : {
-      type: 'datetime'
+      type: 'datetime',
+      defaultsTo: 'Tue Feb 17 2015 14:44:44 GMT-0500 (EST)'
     }
   },
 

@@ -11,7 +11,7 @@ module.exports = {
   	sender: {	// Person who initiated friend request
   		model: 'user'
   	},
-  	recipient: { // Person who should recieve friend request
+  	recipient: { // Person who should receive friend request
   		model: 'user'
   	}
   }
