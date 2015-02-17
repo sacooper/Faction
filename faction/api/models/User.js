@@ -28,13 +28,13 @@ module.exports = {
     	collection: 'acceptedFriendRequest',
       via: 'sender'
     },
-    pendingTo  : {  // Friend requests this user recieved
+    pendingSentRequests  : { 
       collection: 'pendingFriendRequest',
-      via: 'recipient'
-    },
-    pendingFrom : { // Friend Requests this user sent
-    	collection: 'pendingFriendRequest',
       via: 'sender'
+    },
+    pendingReceivedRequests : {
+    	collection: 'pendingFriendRequest',
+      via: 'recipient'
     },
     friends : {
     	collection: 'user'
