@@ -9,11 +9,11 @@ module.exports = {
 
   attributes: {
   	sender: {
-  		model:'user',
+  		model: 'user',
   	},
   	newFriend: {	// person who accepted
-  		model:'user'
-  	},
+  		model: 'user'
+  	}
   }
 };
 

@@ -28,7 +28,7 @@ module.exports = {
     	collection: 'acceptedFriendRequest',
       via: 'sender'
     },
-    pendingSentRequests  : { 
+    pendingSentRequests : { 
       collection: 'pendingFriendRequest',
       via: 'sender'
     },

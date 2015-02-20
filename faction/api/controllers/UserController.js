@@ -271,16 +271,11 @@ module.exports = {
 		User.findOne()
 			.where({username: friendUsername})
 			.populate('friends')
-			.populate('newFriends')
-			.populate('pendingFrom')
-			.populate('pendingTo')
 			.then(function(friend) {
+
 				User.findOne()
 					.where({id: myId})
 					.populate('friends')
-					.populate('newFriends')
-					.populate('pendingFrom')
-					.populate('pendingTo')
 					.then(function(me) {
 
 						// Check if user tried adding himself
@@ -297,47 +292,62 @@ module.exports = {
 						// Otherwise proceed and add him to friends
 						else {
 
-							friend.pendingTo.remove(myId);
-							me.pendingFrom.remove(friend.id);
+							PendingFriendRequest.destroy({
+								sender: friend.id,
+								recipient: me.id
+							}).exec(function(err) {
+								if(err) {
+									addFriendError(err);
+								}
+								else if(accepted === "true") {
 
-							if(accepted === "true") {
-								me.newFriends.add(friend.id);
-								me.friends.add(friend.id);
+									me.friends.add(friend.id);
 
-								friend.newFriends.add(myId);
-								friend.friends.add(myId);
-								me.save(function(err, user) {
-									if(err) {
-										sails.log(err);
-										res.status(500).send(err);
-									} else {
-										friend.save(function(err, user) {
-											if(err) {
-												sails.log(err);
-												res.status(500).send(err);
-											} else {
-												res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
-											}
-										});
-									}
-								});
-							} else {
-								me.save(function(err, user) {
-									if(err) {
-										sails.log(err);
-										res.status(500).send(err);
-									} else {
-										friend.save(function(err, user) {
-											if(err) {
-												sails.log(err);
-												res.status(500).send(err);
-											} else {
-												res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
-											}
-										});
-									}
-								});
-							}
+									friend.friends.add(myId);
+									me.save(function(err, user) {
+										if(err) {
+											sails.log(err);
+											res.status(500).send(err);
+										} else {
+											friend.save(function(err, user) {
+												if(err) {
+													sails.log(err);
+													res.status(500).send(err);
+												} else {
+													AcceptedFriendRequest.create({
+														sender: friend.id,
+														newFriend: me.id
+													}).exec(function(err, fReq) {
+														if(err) {
+															sails.log(err);
+															res.status(500).send(err);
+														} else {
+															res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
+														}
+													});
+												}
+											});
+										}
+									});
+								} else {
+									me.save(function(err, user) {
+										if(err) {
+											sails.log(err);
+											res.status(500).send(err);
+										} else {
+											friend.save(function(err, user) {
+												if(err) {
+													sails.log(err);
+													res.status(500).send(err);
+												} else {
+													res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
+												}
+											});
+										}
+									});
+								}
+							});
+
 						}
 					}).catch(addFriendError);
 			}).catch(addFriendError);
@@ -354,33 +364,44 @@ module.exports = {
 		};
 
 		var reverseRequest = function(me, friend) {
-				
+
 			// Remove pending requests
-			friend.pendingTo.remove(me.id);
-			me.pendingFrom.remove(friend.id);
-			
-			// Add ME to friend's friendlist
-			friend.friends.add(me.id);
-			friend.newFriends.add(myId);
-
-			// Add FRIEND to my friendlist
-			me.friends.add(friend.id);
-			me.newFriends.add(friend.id);
-
-			// Save changes to database
-			friend.save(function(err, user){
+			PendingFriendRequest.destroy({
+				sender: friend.id,
+				recipient: me.id
+			}).exec(function(err) {
 				if(err) {
-					sails.log(err);
-					res.status(500).send(err);
+					requestError(err);
 				} else {
-					me.save(function(err) {
+
+					// Put into friend's list
+					me.friends.add(friend.id);
+					friend.friends.add(me.id);
+
+					// Save changes to database
+					friend.save(function(err, user){
 						if(err) {
-							sails.log(err);
-							res.status(500).send(err);
+							requestError(err);
 						} else {
-							res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'});
+							me.save(function(err) {
+								if(err) {
+									requestError(err);
+								} else {
+									AcceptedFriendRequest.create({
+										sender: friend.id,
+										newFriend: me.id
+									}).exec(function(err, fReq) {
+										if(err) {
+											requestError(err);
+										} else {
+											res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'});
+										}
+									});
+								}
+							});
 						}
 					});
+				
 				}
 			});
 		};
@@ -399,34 +420,39 @@ module.exports = {
 			.populate('newFriends')
 			.then(function(friend) {
 
-				// Get all friend information and spread it
+				if(friend) {
+					// Get all friend information and spread it
 
-				var friendReceivedFromUsers = User.find({
-					id: _.pluck(friend.pendingReceivedRequests, 'sender')
-				}).then(function(users){
-					return users;
-				});
+					var friendReceivedFromUsers = User.find({
+						id: _.pluck(friend.pendingReceivedRequests, 'sender')
+					}).then(function(users){
+						return users;
+					});
 
-				var friendSentToUsers = User.find({
-					id: _.pluck(friend.pendingSentRequests, 'recipient')
-				}).then(function(users){
-					return users;
-				})
+					var friendSentToUsers = User.find({
+						id: _.pluck(friend.pendingSentRequests, 'recipient')
+					}).then(function(users){
+						return users;
+					});
 
-				return [friend, friendReceivedFromUsers, friendSentToUsers];
+					return [friend, friendReceivedFromUsers, friendSentToUsers];
+				} else {
+					// TODO: fix, should not spread further.
+					res.status(200).send({error: "Username of friend is invalid"});
+				}
 
 			})
 			.spread(function(friend, friendReceivedFromUsers, friendSentToUsers) {
-				User.findOne()
-					.where({id: myId})
-					.populate('pendingReceivedRequests')
-					.populate('pendingSentRequests')
-					.populate('friends')
-					.populate('newFriends')
-					.then(function(me) {
+			User.findOne()
+				.where({id: myId})
+				.populate('pendingReceivedRequests')
+				.populate('pendingSentRequests')
+				.populate('friends')
+				.populate('newFriends')
+				.then(function(me) {
 
-						// Get all my information and spread it
-
+					// Get all my information and spread it
+					if(me) {
 						var meReceivedFromUsers = User.find({
 							id: _.pluck(me.pendingReceivedRequests, 'sender')
 						}).then(function(users){
@@ -441,88 +467,51 @@ module.exports = {
 
 						return [friend, friendReceivedFromUsers, friendSentToUsers,
 								me, meReceivedFromUsers, meSentToUsers];
+					} else {
+						// TODO: fix, should not spread further.
+						res.status(200).send({error: "Your id is invalid, try logging in again."});
+					}
 
-					})
-					.spread(function(friend, friendReceivedFromUsers, friendSentToUsers,
-								me, meReceivedFromUsers, meSentToUsers) {
-							
-							console.log(friend);
-							console.log(friendReceivedFromUsers);
-							console.log(friendSentToUsers);
-							console.log(me);
-							console.log(meReceivedFromUsers);
-							console.log(meSentToUsers);
-							res.status(200).send('got here');
+				})
+				.spread(function(friend, friendReceivedFromUsers, friendSentToUsers,
+							me, meReceivedFromUsers, meSentToUsers) {
 
-							if(me.id === friend.id) {
-								res.status(200).send({error: 'You cannot add yourself.'});
-							}
-						// logic happens here
-
-					}).catch(requestError);
-			}).catch(requestError);
-
-		User.findOne()
-			.where({username: friendUsername})
-			.populate('pendingReceivedRequests')
-			.populate('pendingSentRequests')
-			.populate('friends')
-			.populate('newFriends')
-			.then(function(friend) {
-
-				User.findOne()
-					.where({id: myId})
-					.populate('pendingReceivedRequests')
-					.populate('pendingSentRequests')
-					.populate('friends')
-					.populate('newFriends')
-					.then(function(me) {
-
-						if(me.id === friend.id) {
-							res.status(200).send({error: 'You cannot add yourself.'});
-						} else {
-
-	 						// Already did a friend request
-							if(_.some(friend.pendingFrom, function(f){return f.id === me.id;}) 
-								&& _.some(me.pendingTo, function(f){return f.id === friend.id;})) {
-								res.status(200).send({error: 'Already posted a request'});
-							}
-
-							// Check if both users are already friends
-							else if(_.some(friend.friends, function(f){return f.id === me.id;}) 
-								&& _.some(me.friends, function(f){return f.id === friend.id;})) {
-								res.status(200).send({error: 'You are already friends with ' + friend.username + '!'});
-							}
-
-							// Check if a friend request already happened before from the friend
-							else if(_.some(friend.pendingTo, function(f){return f.id === me.id;})) {
-								reverseRequest(me, friend)
-							}
+					if(me.id === friend.id) {
+						res.status(200).send({error: 'You cannot add yourself.'});
+					} else {
 						
-							else {
-								friend.pendingFrom.add(myId);
-								me.pendingTo.add(friend.id);
-
-								friend.save(function(err) {
-									if(err) {
-										sails.log(err);
-										res.status(500).send(err);
-									} else {
-										me.save(function(err) {
-											if(err) {
-												sails.log(err);
-												res.status(500).send(err);
-											} else {
-												res.status(200).send({message: "Successfully posted a friend request"});
-											}
-										});
-									}
-								});
-							}
+						// Already did a friend request
+						if(_.some(friendReceivedFromUsers, function(f){return f.id === me.id;})
+							&& _.some(meSentToUsers, function(f){return f.id === friend.id;})) {
+							res.status(200).send({error: 'Friend request already posted'});
+						} 
+						
+						// Check if both users are already friends
+						else if(_.some(friend.friends, function(f){return f.id === me.id;}) 
+							&& _.some(me.friends, function(f){return f.id === friend.id;})) {
+							res.status(200).send({error: 'You are already friends with ' + friend.username + '!'});
 						}
 
-					}).catch(requestError);
+						//Check if a friend request already happened before from the friend
+						else if(_.some(friendSentToUsers, function(f){return f.id === me.id;})) {
+							reverseRequest(me, friend);
+						}
 
+						// Otherwise create the friend request
+						else {
+							PendingFriendRequest.create({
+								recipient: friend.id,
+								sender: myId
+							}).exec(function(err, pReq) {
+								if(err) {
+									requestError(err);
+								} else {
+									res.status(200).send({message: "Successfully posted a friend request"});
+								}
+							});
+						}
+					}
+				}).catch(requestError);
 			}).catch(requestError);
 	}
 };
