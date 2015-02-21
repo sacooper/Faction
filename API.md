@@ -2,8 +2,6 @@
 - /route/ (METHOD)(OPTION1)(OPTION2)...(OPTIONX)
 - (+) means you have to be logged in to use the API method
     - If you are not, it will return a 403 forbidden
-- (1) means it is sent only once
-- (*) means it is sent as long as no action takes place to change it
 - All success response have the following format
 ```javascript
 {
@@ -119,39 +117,36 @@ Request body
 - TODO
 
 ## User info flow and update control
+- (1) means data is sent only once
+- (*) means data is sent as long as no action takes place to change it
 ### Getting all user information
 #### /api/user/info (GET)(+)
 - Success: 200 OK
 Request body
 ```javascript
 {
-    friends: [], 
-    receivedFriendRequests: [], 
-    acceptedFriendRequests: [], 
-    factionsReceived: [], 
-    factionsSent: [], 
-    pendingFactions: [], 
-    factionResponses: [], 
-    updateTimestamp: "some date"
+    friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
+    receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
+    acceptedFriendRequests: [], // (1) username strings (they are your new friends)
+    factionsReceived: [], // (*) array of {sender, story, fact, factionId}
+    factionsSent: [], // (*) an array of {sender, story, fact, factionId}
+    pendingFactions: [], // (*) an array of {sender, story, fact, factionId}
+    /* 
+        For factionsReceived, factionsSent and pendingFactions
+        - sender is a username string
+        - story is a string
+        - fact is a boolean
+        - factionId is string
+    */
+    factionResponses: [], // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
+    /* 
+        factionId is a string
+        responderUsername is a string // (TODO: check, maybe only send counts for fact/fiction)
+        response is a boolean
+    */
+    updateTimestamp: "some date" // (*) string containing a date
 }
 ```
-    - friends(*) is an array of username strings of all your friends (includes acceptedFriendRequests)
-    - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
-    - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
-    - factionsReceived(*) is an array of {sender, story, fact, factionId}
-    - factionsSent(*) is an array of {sender, story, fact, factionId}
-    - pendingFactions(*) is an array of {sender, story, fact, factionId}
-        - For factionsReceived, factionsSent and pendingFactions
-            - sender is a username string
-            - story is a string
-            - fact is a boolean
-            - factionId is string
-    - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
-        - factionId is a string
-        - responderUsername is a string (TODO: check, maybe only send counts for fact/fiction)
-        - response is a boolean
-    - updateTimestamp(*) is a string containing a date
-
 - Error: 500 Internal Server Error
     - error returned
 
@@ -164,25 +159,24 @@ Request body
 Request body
 ```javascript
 {
-    receivedFriendRequests: [], 
-    acceptedFriendRequests: [], 
-    pendingFactions: [], 
-    factionResponses: [], 
-    updateTimestamp: "somedate"
+    receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
+    acceptedFriendRequests: [], // (1) username strings (they are your new friends)
+    pendingFactions: [],        // (*) array of {sender, story, fact, factionId}
+    /* 
+        sender is a username string
+        story is a string
+        fact is a boolean
+        factionId is string
+    */
+    factionResponses: [],       // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
+    /* 
+        factionId is a string
+        responderUsername is a string // (TODO: check, maybe only send counts for fact/fiction)
+        response is a boolean
+    */
+    updateTimestamp: "somedate" // (*) string containing a date
 }
 ```
-    - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
-    - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
-    - pendingFactions(*) is an array of {sender, story, fact, factionId}
-        - sender is a username string
-        - story is a string
-        - fact is a boolean
-        - factionId is string
-    - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
-        - factionId is a string
-        - responderUsername is a string
-        - response is a boolean
-    - updateTimestamp(*) is a string containing a date
 
 - Error: 400 Bad Request
     - Something wrong with the user's session
