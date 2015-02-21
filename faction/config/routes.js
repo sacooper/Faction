@@ -51,6 +51,7 @@ module.exports.routes = {
   /** Frient request routes **/
   'post /api/user/request-friend'   : 'UserController.addFriend',
   'post /api/user/accept-friend'    : 'UserController.acceptFriendRequest',
+  'delete /api/user/delete-friend'  : 'UserController.deleteFriend',
 
   /** User utilities **/
   'get /api/user/search'            : 'UserController.search',

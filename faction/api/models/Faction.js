@@ -16,7 +16,7 @@ module.exports = {
         via: 'factionsReceived',
         dominant: true
     },
-    unreadStatus: {
+    status: {
         collection: 'pendingFaction',
         via: 'faction'
     }, 

@@ -48,7 +48,7 @@
     - "faction" contains the text of the faction
     - "fact" will be set to "true" (lowercase) if faction is true, faction will be considered false otherwise
 - Success: 201 Created
-    - Body contains {faction_id}, uniquely generated ID to identify faction by
+    - Body contains {factionId}, uniquely generated ID to identify faction by
 - Error: 400 Bad Request
     - Body contains string of error
     - Errors include something not being present
@@ -58,10 +58,11 @@
 
 ### Sending Response to a Faction
 #### /api/factions/respond
-- JSON object {fact}
-    - Considered true if fact set to "true", false otherwise
+- JSON object {factionId, userResponse}
+    - factionId is the faction id you are responding to
+    - userResponse is a string containing "true" or "false" as a string
 - Success: 200 OK
-    - **Do we need request body here?**
+    - Body contains {isRight}, which is a boolean containing whether the user's answer was correct
 - Error: 403 forbidden - user not logged in
 
 ## User info flow and update control
@@ -128,8 +129,15 @@
 ### Responding to a Friend Request
 #### /api/user/accept-friend (POST)
 - JSON object {username, accepted}
-    - Friend contains username of person accepting
+    - username is the username of person you wish to accept as a friend
     - Will accept if accepted is true, assumed false otherwise
+- Success: 200 OK
+- Error: 403 Forbidden - user not logged in
+
+### Deleting a friend
+#### /api/user/delete-friend (DELETE)
+- JSON object {username}
+    - username is the username of the friend you wish to delete
 - Success: 200 OK
 - Error: 403 Forbidden - user not logged in
 
