@@ -1,8 +1,19 @@
 # Faction API
 - All POST, PUT bodies contain JSON objects
 - ":id" signifies ID of user
+- (+) means you have to be logged in to use the API method
+    - If you are not, it will return a 403 forbidden
 - (1) means it is sent only once
 - (*) means it is sent as long as no action takes place to change it
+- All success response have the following format
+{
+    message: 'String message'
+    data: format specified in API (if not specified, is an empty object)
+}
+- All error reponse have the following format
+{
+    error: 'Error message string' or other format can be specified in API
+}
 
 ## Account Management
 ### Create an Account
@@ -18,7 +29,7 @@
     - must be included in all subsequent API calls to be authenticated
 
 ### Change Password
-#### /api/user/update-password (PUT)
+#### /api/user/update-password (PUT)(+)
 - JSON object: {old, new}
 - client must verify password confirmation
 - Success: 200 Ok
@@ -42,32 +53,43 @@
 
 ## Faction
 ### Sending a faction
-#### /api/factions/send (POST)
+#### /api/factions/send (POST)(+)
 - JSON object {to:[], faction, fact}
     - "to" contains a list of usernames for recipients
     - "faction" contains the text of the faction
-    - "fact" will be set to "true" (lowercase) if faction is true, faction will be considered false otherwise
+    - "fact" is a boolean
 - Success: 201 Created
-    - Body contains {factionId}, uniquely generated ID to identify faction by
+    - data attribute contains {factionId}, uniquely generated ID to identify the faction
 - Error: 400 Bad Request
-    - Body contains string of error
-    - Errors include something not being present
+    - No sender included
+    - No fact sent
+    - No faction sent
+    - No recipients sent
+    - No valid recipients sent
 - Error: 500 Internal Server Error
-    - Something wierd happened
     - Error returned
 
 ### Sending Response to a Faction
-#### /api/factions/respond
+#### /api/factions/respond (POST)(+)
 - JSON object {factionId, userResponse}
     - factionId is the faction id you are responding to
-    - userResponse is a string containing "true" or "false" as a string
+    - userResponse is a boolean
 - Success: 200 OK
-    - Body contains {isRight}, which is a boolean containing whether the user's answer was correct
-- Error: 403 forbidden - user not logged in
+    - data attribute {isRight}, which is a boolean containing whether the user's answer was correct
+- Error: 400 Bad Request
+    - Tried to answer your own faction
+    - You have already answered this faction
+    - You need to provide a response
+    - You need to provide a faction id
+- Error: 500 Internal Server Error
+    - Error returned
+
+### Deleting a faction
+- TODO
 
 ## User info flow and update control
 ### Getting all user information
-#### /api/user/info (GET)
+#### /api/user/info (GET)(+)
 - Success: 200 OK
 - Body contains JSON object {friends: [], receivedFriendRequests: [], acceptedFriendRequests: [], factionsReceived: [], factionsSent: [], pendingFactions: [], factionResponses: [], updateTimestamp}
     - friends(*) is an array of username strings of all your friends (includes acceptedFriendRequests)
@@ -92,7 +114,7 @@
     - error returned
 
 ### Updating
-#### /api/user/update (POST)
+#### /api/user/update (POST)(+)
 - Body of request contains {updateTimestamp, viewedFactions: []}
     - updateTimestamp is string identical sent in the last /api/user/info or /api/user/update
     - viewedFactions is an array of faction IDs from pendingFactions that were seen by the user
@@ -119,52 +141,73 @@
 
 ## Friends
 ### Sending a Friend Request
-#### /api/user/request-friend (POST)
+#### /api/user/request-friend (POST)(+)
 - JSON object {username}
     - Friend contains username of person to request
+- Success: 200 OK
+    - Already friends with user
+    - User already added you, therefore you are now friends
 - Success: 201 Created
-    - No Body, occurs on successful cration of friend request
-- Error: 403 Forbidden - user not logged in
+    - Created friend request
+- Error: 400 Bad Request
+    - Username of friend is invalid
+    - Cannot add yourself
+    - Friend request already posted
+    - Already friends with user
+- Error: 500 Internal Server Error
+    - return error
 
 ### Responding to a Friend Request
-#### /api/user/accept-friend (POST)
+#### /api/user/accept-friend (POST)(+)
 - JSON object {username, accepted}
     - username is the username of person you wish to accept as a friend
     - Will accept if accepted is true, assumed false otherwise
 - Success: 200 OK
-- Error: 403 Forbidden - user not logged in
+    - Case accepted was true
+        - Already friends with user
+        - Successfully added user
+    - Case accepted was false
+        - Successfully removed friend request from user
+- Error: 400 Bad Request
+    - Cannot add yourself
+    - Username provided is invalid
+- Error: 500 Internal Server Error
+    - return error
 
 ### Deleting a friend
-#### /api/user/delete-friend (DELETE)
+#### /api/user/delete-friend (DELETE)(+)
 - JSON object {username}
     - username is the username of the friend you wish to delete
 - Success: 200 OK
-- Error: 403 Forbidden - user not logged in
+    - Successfully removed user from friend's list
+    - User was already not your friend
+- Error: 400 Bad Request
+    - Tried to remove himself
+- Error: 500 Internal Server Error
+    - return error
 
 ## User utilities
-### Searching for Users
-#### /api/user/search (GET)
-- Optional query parameter search=""
-    - If search paramater not included, returns a list of all users, otherwise only returns users with usernames containing that substring
-- Success: 200 OK
-    - Body contains JSON object {friends : []}, containing list of usernames of user's friends
-- Error: 403 Forbidden 
-    - user not logged in
+### Getting all factions related to user
+#### /api/user/factions (GET)(+)
+- Success; 200 OK
+    - data attribute of body contains JSON object {sent: [], received: []}
+        - sent is an array of {sender: username string,story,fact,id}
+        - received is an array of {sender: your user id,story,fact,id}
 - Error: 500 Internal Server Error
     - error returned
 
 ### Getting user's friends
-#### /api/user/friends (GET)
+#### /api/user/friends (GET)(+)
 - Success: 200 OK
-- Body contains JSON object {friends: []}, the array contains username strings
+    - data attribute contains JSON array containing a list of your friends' usernames
 - Error: 500 Internal Server Error
-- error returned
+    - error returned
 
-### Getting all factions related to user
-#### /api/user/factions (GET)
-- Success; 200 OK
-    - Body contains JSON object {sent: [], received: []}
-        - sent is an array of {sender: username string,story,fact,id}
-        - received is an array of {sender: your user id,story,fact,id}
+### Searching for Users
+#### /api/user/search (GET)(+)
+- Optional query parameter search=""
+    - search parameter to match all users in database
+- Success: 200 OK
+    - data attribute contains a JSON array, containing list of usernames that match the search parameter (or all usernames if search parameter is empty)
 - Error: 500 Internal Server Error
     - error returned
