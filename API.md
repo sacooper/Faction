@@ -7,27 +7,27 @@
 - All success response have the following format
 ```javascript
 {
-    message: 'String message'
-    data: format specified in API (if not specified, is an empty object)
+    message: "String message",
+    data: "format specified in API (if not specified, is an empty object)"
 }
 ```
 - All error reponse have the following format
 ```javascript
 {
-    error: 'Error message string' or other format can be specified in API
+    error: "'Error message string' or other format can be specified in API"
 }
 ```
 
 ## Account Management
 ### Create an Account
 #### /api/user/new (POST)
-- JSON object: 
- ```javascript
+Request body 
+```javascript
 {
-    email: some@email.com, 
-    password: somepassword, 
-    username: someusername, 
-    "action":"register"
+    email: "some@email.com", 
+    password: "somepassword", 
+    username: "someusername", 
+    action: "register"
 }
 ```
 - client must verify password confirmation
@@ -41,7 +41,13 @@
 
 ### Change Password
 #### /api/user/update-password (PUT)(+)
-- JSON object: {old, new}
+Request body 
+```javascript
+{
+    old: "oldpassword",
+    new: "newpassword"
+}
+```
 - client must verify password confirmation
 - Success: 200 Ok
 - Error: 500 Internal Server Error
@@ -51,7 +57,13 @@
 
 ### Log into Account
 #### /api/user/login (POST)
-- JSON object: {identifier:"", password:""}
+Request body
+```javascript
+{
+    identifier: "username or email", 
+    password: "userpassword"
+}
+```
 - Success: 200 OK
     - Contains cooking with session id
 - Error: 401 Unauthorized
@@ -65,10 +77,14 @@
 ## Faction
 ### Sending a faction
 #### /api/factions/send (POST)(+)
-- JSON object {to:[], faction, fact}
-    - "to" contains a list of usernames for recipients
-    - "faction" contains the text of the faction
-    - "fact" is a boolean
+Request body
+```javascript
+{
+    to:["username1", "username2", "..."], // array of usernames
+    faction : "The story itself",
+    fact: true // or false, boolean type
+} 
+```
 - Success: 201 Created
     - data attribute contains {factionId}, uniquely generated ID to identify the faction
 - Error: 400 Bad Request
@@ -82,9 +98,13 @@
 
 ### Sending Response to a Faction
 #### /api/factions/respond (POST)(+)
-- JSON object {factionId, userResponse}
-    - factionId is the faction id you are responding to
-    - userResponse is a boolean
+Request body
+```javascript
+{
+    factionId: "Unique faction ID", 
+    userResponse: true //or false, boolean response
+}
+```
 - Success: 200 OK
     - data attribute {isRight}, which is a boolean containing whether the user's answer was correct
 - Error: 400 Bad Request
@@ -102,19 +122,30 @@
 ### Getting all user information
 #### /api/user/info (GET)(+)
 - Success: 200 OK
-- Body contains JSON object {friends: [], receivedFriendRequests: [], acceptedFriendRequests: [], factionsReceived: [], factionsSent: [], pendingFactions: [], factionResponses: [], updateTimestamp}
+Request body
+```javascript
+{
+    friends: [], 
+    receivedFriendRequests: [], 
+    acceptedFriendRequests: [], 
+    factionsReceived: [], 
+    factionsSent: [], 
+    pendingFactions: [], 
+    factionResponses: [], 
+    updateTimestamp: "some date"
+}
+```
     - friends(*) is an array of username strings of all your friends (includes acceptedFriendRequests)
     - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
     - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
     - factionsReceived(*) is an array of {sender, story, fact, factionId}
     - factionsSent(*) is an array of {sender, story, fact, factionId}
     - pendingFactions(*) is an array of {sender, story, fact, factionId}
-
-        For factionsReceived, factionsSent and pendingFactions
-        - sender is a username string
-        - story is a string
-        - fact is a boolean
-        - factionId is string
+        - For factionsReceived, factionsSent and pendingFactions
+            - sender is a username string
+            - story is a string
+            - fact is a boolean
+            - factionId is string
     - factionResponses(1) is an array of {factionId, responderUsername, response} that are responses to your sent factions
         - factionId is a string
         - responderUsername is a string (TODO: check, maybe only send counts for fact/fiction)
@@ -130,7 +161,16 @@
     - updateTimestamp is string identical sent in the last /api/user/info or /api/user/update
     - viewedFactions is an array of faction IDs from pendingFactions that were seen by the user
 - Success: 200 OK
-- Body contains {receivedFriendRequests: [], acceptedFriendRequests: [], pendingFactions: [], factionResponses: [], updateTimestamp}
+Request body
+```javascript
+{
+    receivedFriendRequests: [], 
+    acceptedFriendRequests: [], 
+    pendingFactions: [], 
+    factionResponses: [], 
+    updateTimestamp: "somedate"
+}
+```
     - receivedFriendRequests(*) is an array of username strings (they are awaiting an answer from you)
     - acceptedFriendRequests(1) is an array of username strings (they are your new friends)
     - pendingFactions(*) is an array of {sender, story, fact, factionId}
@@ -153,8 +193,12 @@
 ## Friends
 ### Sending a Friend Request
 #### /api/user/request-friend (POST)(+)
-- JSON object {username}
-    - Friend contains username of person to request
+Request body
+```javascript
+{
+    username: "someusername"
+}
+```
 - Success: 200 OK
     - Already friends with user
     - User already added you, therefore you are now friends
@@ -170,9 +214,14 @@
 
 ### Responding to a Friend Request
 #### /api/user/accept-friend (POST)(+)
-- JSON object {username, accepted}
-    - username is the username of person you wish to accept as a friend
-    - Will accept if accepted is true, assumed false otherwise
+Request body
+```javascript
+{
+    username: "someusername", 
+    accepted: true // or false, boolean type
+}
+```
+
 - Success: 200 OK
     - Case accepted was true
         - Already friends with user
@@ -187,8 +236,13 @@
 
 ### Deleting a friend
 #### /api/user/delete-friend (DELETE)(+)
-- JSON object {username}
-    - username is the username of the friend you wish to delete
+Request body
+```javascript
+{
+    username: "someusername"
+}
+```
+
 - Success: 200 OK
     - Successfully removed user from friend's list
     - User was already not your friend
