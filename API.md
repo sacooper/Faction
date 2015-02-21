@@ -122,7 +122,7 @@ Request body
 ### Getting all user information
 #### /api/user/info (GET)(+)
 - Success: 200 OK
-Request body
+Response body
 ```javascript
 {
     friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
@@ -156,7 +156,7 @@ Request body
     - updateTimestamp is string identical sent in the last /api/user/info or /api/user/update
     - viewedFactions is an array of faction IDs from pendingFactions that were seen by the user
 - Success: 200 OK
-Request body
+Response body
 ```javascript
 {
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
