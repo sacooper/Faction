@@ -24,7 +24,7 @@ Request body
 {
     email: "some@email.com", 
     password: "somepassword", 
-    username: "someusername", 
+    username: "someusername",
     action: "register"
 }
 ```
