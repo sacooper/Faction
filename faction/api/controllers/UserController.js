@@ -311,8 +311,8 @@ module.exports = {
 							.catch(errFct);;
 						}
 					}
-				}).catch(requestError);
-			}).catch(requestError);
+				}).catch(errFct);
+			}).catch(errFct);
 	},
 
 	acceptFriendRequest: function(req, res) {
@@ -375,11 +375,11 @@ module.exports = {
 										.then(function(fReq) {
 											res.status(200).send(Message.createSuccess('Successfully added ' + friend.username + ' to your friends!', {}));	
 										})
-										.catch(errFct(err));
+										.catch(errFct);
 									})
-									.catch(errFct(err));
+									.catch(errFct);
 								})
-								.catch(errFct(err));
+								.catch(errFct);
 							} else {
 								me.save()
 								.then(function(user) {
