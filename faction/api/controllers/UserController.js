@@ -182,9 +182,8 @@ module.exports = {
 		var friendUsername = req.param('username');
 		var myId = req.user.id;
 
-		var requestError = function(err) {
-			sails.log(err);
-			res.status(500).send(err);
+		var errFct = function(err) {
+			return res.status(500).send(Message.createError(err));
 		};
 
 		var reverseRequest = function(me, friend) {
@@ -193,48 +192,33 @@ module.exports = {
 			PendingFriendRequest.destroy({
 				sender: friend.id,
 				recipient: me.id
-			}).exec(function(err) {
-				if(err) {
-					requestError(err);
-				} else {
+			})
+			.then(function(pfr) {
+				// Put into friend's list
+				me.friends.add(friend.id);
+				friend.friends.add(me.id);
 
-					// Put into friend's list
-					me.friends.add(friend.id);
-					friend.friends.add(me.id);
+				// Save changes to database
+				friend.save()
+				.then(function(user){
+					me.save()
+					.then(function(user) {
+						AcceptedFriendRequest.create({
+							sender: friend.id,
+							newFriend: me.id
+						})
+						.then(function(fReq) {
+							res.status(200).send(Message.createSuccess(friend.username + ' already added you, therefore you are now friends'), {});
 
-					// Save changes to database
-					friend.save(function(err, user){
-						if(err) {
-							requestError(err);
-						} else {
-							me.save(function(err) {
-								if(err) {
-									requestError(err);
-								} else {
-									AcceptedFriendRequest.create({
-										sender: friend.id,
-										newFriend: me.id
-									}).exec(function(err, fReq) {
-										if(err) {
-											requestError(err);
-										} else {
-											res.status(200).send({message: friend.username + ' already added you, therefore you are now friends'});
-										}
-									});
-								}
-							});
-						}
-					});
-				
-				}
-			});
+						})
+						.catch(errFct);;
+					})
+					.catch(errFct);
+				})
+				.catch(errFct);
+			})
+			.catch(errFct);
 		};
-
-		// Get all friend information
-		// Spread
-		// Get all my information
-		// Spread
-		// Save appropriate models accordingly
 
 		User.findOne()
 			.where({username: friendUsername})
@@ -249,20 +233,20 @@ module.exports = {
 
 					var friendReceivedFromUsers = User.find({
 						id: _.pluck(friend.pendingReceivedRequests, 'sender')
-					}).then(function(users){
-						return users;
-					});
+					})
+					.then(_.identity)
+					.catch(errFct);
 
 					var friendSentToUsers = User.find({
 						id: _.pluck(friend.pendingSentRequests, 'recipient')
-					}).then(function(users){
-						return users;
-					});
+					})
+					.then(_.identity)
+					.catch(errFct);
 
 					return [friend, friendReceivedFromUsers, friendSentToUsers];
 				} else {
 					// TODO: fix, should not spread further.
-					res.status(200).send({error: "Username of friend is invalid"});
+					res.status(400).send(Message.createError("Username of friend is invalid"));
 				}
 
 			})
@@ -275,45 +259,39 @@ module.exports = {
 				.populate('newFriends')
 				.then(function(me) {
 
-					// Get all my information and spread it
-					if(me) {
-						var meReceivedFromUsers = User.find({
-							id: _.pluck(me.pendingReceivedRequests, 'sender')
-						}).then(function(users){
-							return users;
-						});
+					var meReceivedFromUsers = User.find({
+						id: _.pluck(me.pendingReceivedRequests, 'sender')
+					})
+					.then(_.identity)
+					.catch(errFct);
 
-						var meSentToUsers = User.find({
-							id: _.pluck(me.pendingSentRequests, 'recipient')
-						}).then(function(users){
-							return users;
-						})
+					var meSentToUsers = User.find({
+						id: _.pluck(me.pendingSentRequests, 'recipient')
+					})
+					.then(_.identity)
+					.catch(errFct);
 
-						return [friend, friendReceivedFromUsers, friendSentToUsers,
-								me, meReceivedFromUsers, meSentToUsers];
-					} else {
-						// TODO: fix, should not spread further.
-						res.status(200).send({error: "Your id is invalid, try logging in again."});
-					}
+					return [friend, friendReceivedFromUsers, friendSentToUsers,
+							me, meReceivedFromUsers, meSentToUsers];
 
 				})
 				.spread(function(friend, friendReceivedFromUsers, friendSentToUsers,
 							me, meReceivedFromUsers, meSentToUsers) {
 
 					if(me.id === friend.id) {
-						res.status(200).send({error: 'You cannot add yourself.'});
+						res.status(400).send(Message.createError('You cannot add yourself.'));
 					} else {
 						
 						// Already did a friend request
 						if(_.some(friendReceivedFromUsers, function(f){return f.id === me.id;})
 							&& _.some(meSentToUsers, function(f){return f.id === friend.id;})) {
-							res.status(200).send({error: 'Friend request already posted'});
+							res.status(400).send(Message.createError('Friend request already posted'));
 						} 
 						
 						// Check if both users are already friends
 						else if(_.some(friend.friends, function(f){return f.id === me.id;}) 
 							&& _.some(me.friends, function(f){return f.id === friend.id;})) {
-							res.status(200).send({error: 'You are already friends with ' + friend.username + '!'});
+							res.status(200).send(Message.createSuccess('You are already friends with ' + friend.username + '!'), {});
 						}
 
 						//Check if a friend request already happened before from the friend
@@ -326,13 +304,11 @@ module.exports = {
 							PendingFriendRequest.create({
 								recipient: friend.id,
 								sender: myId
-							}).exec(function(err, pReq) {
-								if(err) {
-									requestError(err);
-								} else {
-									res.status(200).send({message: "Successfully posted a friend request"});
-								}
-							});
+							})
+							.then(function(pReq) {
+								res.status(201).send(Message.createSuccess("Successfully posted a friend request"), {});
+							})
+							.catch(errFct);;
 						}
 					}
 				}).catch(requestError);
@@ -345,102 +321,92 @@ module.exports = {
 		var accepted = req.param('accepted');
 		var myId = req.user.id;
 
-		var addFriendError = function(err) {
-			sails.log(err);
-			return res.status(500).send(err);
+		var errFct = function(err) {
+			return res.status(500).send(Message.createError(err));
 		};
 
 		User.findOne()
-			.where({username: friendUsername})
-			.populate('friends')
-			.then(function(friend) {
+		.where({username: friendUsername})
+		.populate('friends')
+		.then(function(friend) {
 
+			if(!friend) {
+				res.status(400).send(Message.createError('Username provided is invalid'));
+			} 
+			else {
 				User.findOne()
-					.where({id: myId})
-					.populate('friends')
-					.then(function(me) {
+				.where({id: myId})
+				.populate('friends')
+				.then(function(me) {
 
-						// Check if user tried adding himself
-						if(me.id === friend.id) {
-							res.status(200).send({error: 'You cannot add yourself.'});
-						}
+					// Check if user tried adding himself
+					if(me.id === friend.id) {
+						res.status(400).send(Message.createError('You cannot add yourself.'));
+					}
 
-						// Check if you are already friends with the user
-						else if(_.some(me.friends, function(f){return f.id === friend.id})
-							&& _.some(friend.friends, function(f){return f.id === me.id})) {
-							res.status(200).send({error: 'You are already friends with ' + friend.username})
-						}
+					// Check if you are already friends with the user
+					else if(_.some(me.friends, function(f){return f.id === friend.id})
+						&& _.some(friend.friends, function(f){return f.id === me.id})) {
+						res.status(200).send(Message.createSuccess('You are already friends with ' + friend.username, {}));
+					}
 
-						// Otherwise proceed and add him to friends
-						else {
+					// Otherwise proceed and add him to friends
+					else {
 
-							PendingFriendRequest.destroy({
-								sender: friend.id,
-								recipient: me.id
-							}).exec(function(err) {
-								if(err) {
-									addFriendError(err);
-								}
-								else if(accepted === "true") {
+						PendingFriendRequest.destroy({
+							sender: friend.id,
+							recipient: me.id
+						})
+						.then(function(pfr) {
+							if(accepted === "true") {
 
-									me.friends.add(friend.id);
+								me.friends.add(friend.id);
 
-									friend.friends.add(myId);
-									me.save(function(err, user) {
-										if(err) {
-											sails.log(err);
-											res.status(500).send(err);
-										} else {
-											friend.save(function(err, user) {
-												if(err) {
-													sails.log(err);
-													res.status(500).send(err);
-												} else {
-													AcceptedFriendRequest.create({
-														sender: friend.id,
-														newFriend: me.id
-													}).exec(function(err, fReq) {
-														if(err) {
-															sails.log(err);
-															res.status(500).send(err);
-														} else {
-															res.status(200).send({message: 'Successfully added ' + friend.username + ' to your friends!'});	
-														}
-													});
-												}
-											});
-										}
-									});
-								} else {
-									me.save(function(err, user) {
-										if(err) {
-											sails.log(err);
-											res.status(500).send(err);
-										} else {
-											friend.save(function(err, user) {
-												if(err) {
-													sails.log(err);
-													res.status(500).send(err);
-												} else {
-													res.status(200).send({message: 'Successfully removed friend request from ' + friend.username});	
-												}
-											});
-										}
-									});
-								}
-							});
+								friend.friends.add(myId);
 
-						}
-					}).catch(addFriendError);
-			}).catch(addFriendError);
+								me.save()
+								.then(function(user) {
+									friend.save()
+									.then(function(user) {
+										AcceptedFriendRequest.create({
+											sender: friend.id,
+											newFriend: me.id
+										})
+										.then(function(fReq) {
+											res.status(200).send(Message.createSuccess('Successfully added ' + friend.username + ' to your friends!', {}));	
+										})
+										.catch(errFct(err));
+									})
+									.catch(errFct(err));
+								})
+								.catch(errFct(err));
+							} else {
+								me.save()
+								.then(function(user) {
+									friend.save()
+									.then(function(user) {
+										res.status(200).send(Message.createSuccess('Successfully removed friend request from ' + friend.username, {}));	
+									})
+									.catch(errFct);
+								})
+								.catch(errFct);
+							}
+						})
+						.catch(errFct);
+					}
+				})
+				.catch(errFct);
+			}
+		})
+
+		.catch(errFct);
 	},
 
 	deleteFriend: function(req, res) {
 		var friendUsername = req.param('username');
 
 		var errFct = function(err) {
-			sails.log(err);
-			return res.status(500).send(err);
+			return res.status(500).send(Message.createError(err));
 		};
 
 		User.findOne({
@@ -455,7 +421,9 @@ module.exports = {
 			.then(function(friend) {
 
 				if(me.id === friend.id){
-					res.status(200).send({error: "You are trying to remove yourself..."});
+					res.status(400).send(
+						Message.createError("You are trying to remove yourself...")
+					);
 				}
 				else if(_.some(me.friends, function(f){return f.id === friend.id;})
 					|| _.some(friend.friends, function(f){return f.id === me.id;}))
@@ -464,7 +432,7 @@ module.exports = {
 					friend.friends.remove(me.id);
 					
 					me.save()
-					.then(function(me){
+						.then(function(me){
 						friend.save()
 						.then(function(friend){
 
@@ -476,7 +444,9 @@ module.exports = {
 								newFriend: [me.id, friend.id]
 							})
 							.then(function(afr) {
-								res.status(200).send({message: "Successfully removed " + friend.username + " from your friend's list."});
+								res.status(200).send(
+									Message.createSuccess("Successfully removed " + friend.username + " from your friend's list.", {})
+								);
 							})
 							.catch(errFct);
 						})
@@ -485,7 +455,7 @@ module.exports = {
 					.catch(errFct);
 				}
 				else {
-					res.status(200).send({error: "You are already not friends with " + friend.username});
+					res.status(200).send(Message.createSuccess("You are already not friends with " + friend.username, {}));
 				}
 
 			})
@@ -500,86 +470,93 @@ module.exports = {
 		var userId = req.user.id;
 
 		User.findOne()
-			.where({id: req.user.id})
-			.populate("factionsReceived")
-			.populate("factionsSent")
-			.then(function(me) {
+		.where({id: req.user.id})
+		.populate("factionsReceived")
+		.populate("factionsSent")
+		.then(function(me) {
 
-				var senderIds = me.factionsReceived.map(function(f){ return f.sender; });
+			var senderIds = _.pluck(me.factionsReceived, 'sender');
 
-				User.find({id: senderIds})
-					.exec(function(err, users) {
-						if(err) {
-							sails.log(err);
-							res.status(500).send(err);
-						} else {
-							// TODO: fix this O(n^2) loop
-							users.forEach(function(user) {
-								me.factionsReceived.forEach(function(faction) {
-									if(user.id === faction.sender) {
-										faction.sender = user.username;
-									}
-								})
-							});
-				
-							res.status(200).send(
-								{
-									sent: me.factionsSent.map(function(faction) {
-										return {
-											sender: faction.sender,
-											story: faction.story,
-											fact: faction.fact,
-											id: faction.id
-										}
-									}),
-									received: me.factionsReceived.map(function(faction) {
-										return {
-											sender: faction.sender,
-											story: faction.story,
-											fact: faction.fact,
-											id: faction.id
-										}
-									})
-								}
-							);
+			User.find({id: senderIds})
+			.then(function(users){
+				// TODO: fix this O(n^2) loop
+				users.forEach(function(user) {
+					me.factionsReceived.forEach(function(faction) {
+						if(user.id === faction.sender) {
+							faction.sender = user.username;
 						}
-					});
+					})
+				});
+	
+				var sent = me.factionsSent.map(function(faction) {
+					return {
+						sender: faction.sender,
+						story: faction.story,
+						fact: faction.fact,
+						id: faction.id
+					}
+				});
+
+				var received = me.factionsReceived.map(function(faction) {
+					return {
+						sender: faction.sender,
+						story: faction.story,
+						fact: faction.fact,
+						id: faction.id
+					}
+				});
+
+				res.status(200).send(
+					Message.createSuccess(
+						'Successfully fetched factions', 
+						{ sent: sent, received: received }
+					)
+				);
 			})
-			.catch(function(err){
-				sails.log(err);
-				res.status(500).send(err);
-			});
+			.catch(function(err) {
+				res.status(500).send(Message.createError(err));
+			})
+		})
+		.catch(function(err){
+			res.status(500).send(Message.createError(err));
+		});
 	},
 
 	friends: function(req, res){
-		var cb = function(err, user){
-			if (err){
-				sails.log(err);
-				res.status(500).send(err);
-			} else {
-				var friends = user.friends.map(function(f){return f.username;});
-				res.status(200).send({friends: friends});
-			}
+		var next = function(user){
+			var friends = _.pluck(user.friends, 'username');
+			res.status(200).send(
+				Message.createSuccess(
+					'Successfully fetched friends',
+					friends
+				)
+			);
 		}
 
-		User.findFriends(req.user, cb);
+		var nextErr = function(err) {
+			res.status(500).send(Message.createError(err));
+		}
+
+		User.findFriends(req.user, next, nextErr);
 	},
 
 	search: function(req, res){
 		var str = req.param('search') || "";
 
-		var next = function(err, users){
-			if (err) {
-				sails.log(err);
-				res.status(500).send(err);
-			} else {
-				res.status(200).send(users
-					.filter(function(u) { return !_.isUndefined(u.username); })
-					.map(function(u) { return u.username; }));
-			}
+		var next = function(users){
+			res.status(200).send(
+				Message.createSuccess(
+					"Search successful", 
+					_.pluck(users, 'username')
+				)
+			);
 		};
 
-		User.search(str, next);
+		var nextErr = function(err) {
+			res.status(500).send(Message.createError(err));
+		}
+
+		User.search(str, next, nextErr);
 	}
 
 };

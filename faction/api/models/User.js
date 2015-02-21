@@ -86,15 +86,18 @@ module.exports = {
 	  	});
   },
 
-  findFriends: function(user, next){
+  findFriends: function(user, next, nextErr){
     User.findOne()
       .where({username: user.username})
       .populate('friends')
-      .exec(next);
+      .then(next)
+      .catch(nextErr);
   },
 
-  search: function(str, next){
-    User.find({username: {'contains': str}}).exec(next);
+  search: function(str, next, nextErr){
+    User.find({username: {'contains': str}})
+        .then(next)
+        .catch(nextErr);
   }
 
 };
