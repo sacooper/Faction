@@ -1,24 +1,35 @@
 # Faction API
-- All POST, PUT bodies contain JSON objects
-- ":id" signifies ID of user
+- /route/ (METHOD)(OPTION1)(OPTION2)...(OPTIONX)
 - (+) means you have to be logged in to use the API method
     - If you are not, it will return a 403 forbidden
 - (1) means it is sent only once
 - (*) means it is sent as long as no action takes place to change it
 - All success response have the following format
+```javascript
 {
     message: 'String message'
     data: format specified in API (if not specified, is an empty object)
 }
+```
 - All error reponse have the following format
+```javascript
 {
     error: 'Error message string' or other format can be specified in API
 }
+```
 
 ## Account Management
 ### Create an Account
 #### /api/user/new (POST)
-- JSON object: {email, password, username, "action":"register"}
+- JSON object: 
+ ```javascript
+{
+    email: some@email.com, 
+    password: somepassword, 
+    username: someusername, 
+    "action":"register"
+}
+```
 - client must verify password confirmation
 - success: 200 OK
 - error: 409 Conflict
