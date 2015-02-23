@@ -13,6 +13,7 @@ module.exports = {
 
 	getAllInfo: function(req, res) {
 		var userId = req.user.id;
+		var lastUpdate;
 
 		User.findOne()
 			.where({id: req.user.id})
@@ -23,7 +24,10 @@ module.exports = {
 			.populate("factionsSent")
 			.populate("pendingFactions")
 			.then(function(me) {
+				lastUpdate = me.lastUpdate;
 
+				var updateTimestamp = new Date();
+				
 				// Ids of pending friend request users
 				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.recipient; });
 
@@ -43,13 +47,15 @@ module.exports = {
 				var friends = _.pluck(me.friends, 'username');
 
 				var pendingUsers = User.find({
-						id: pendingReceivedRequestsIds
+						id: pendingReceivedRequestsIds,
+						createdAt: { '>': lastUpdate}
 					}).then(function(pendingFriend) {
 						return pendingFriend;
 					});
 
 				var newFriends = User.find({
-						id: newFriendsIds
+						id: newFriendsIds,
+						// createdAt: { '>': lastUpdate}
 					}).then(function(newFriends) {
 						return newFriends;
 					});
@@ -71,18 +77,17 @@ module.exports = {
 					});
 
 				var pendingFactions = Faction.find({
-						id: factionIds
+						id: factionIds,
+						createdAt: { '>': lastUpdate}
 					})
 					.populate('sender')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
 
-				// TODO:
+				// TODO: INCLUDE createdAt criteria
 				var responses = [];
 
-				// FIXME: toString? defaultsTo in model?
-				var updateTimestamp = me.lastUpdate;
 
 				return [friends, pendingUsers, newFriends, 
 							factionsReceived, factionsSent, pendingFactions,
@@ -93,15 +98,17 @@ module.exports = {
 								factionsReceived, factionsSent, pendingFactions,
 								responses, updateTimestamp) {
 
-				console.log(friends);
-				console.log(pendingUsers);
-				console.log(newFriends);
-				console.log(factionsReceived);
-				console.log(factionsSent);
-				console.log(pendingFactions);
-				console.log(responses);
-				console.log(updateTimestamp);
-				res.status(200).send("got here");
+
+				res.status(200).send({
+					friends : friends,
+					receivedFriendRequests: pendingUsers,
+					acceptedFriendRequests: _.pluck(newFriends, 'username'),
+					factionsReceived: factionsReceived,
+					factionsSent: factionsSent,
+					pendingFactions: pendingFactions,
+					factionResponses: responses,
+					updateTimestamp: updateTimestamp
+				});
 			})
 			.catch(function(err){
 				sails.log(err);
@@ -110,69 +117,94 @@ module.exports = {
 	},
 
 	update: function(req, res){
-		if (req.user == null || typeof req.user === undefined){
-			res.status(400).send({error: "No user included"});
+		var userId = req.user.id;
+
+		var sendErr = function(err) {
+			return res.status(500).send(Message.createError(err));
+		};
+
+		
+		if (req.param('updateTimestamp')){
+			var sentLastUpdate = req.param('updateTimestamp');
 		}
 		else {
-			var buildResponse = function(user){
-
-				// Get initial values
-				var pending_factions = user.pendingFactions || [];
-				var new_friends = user.newFriends || [];
-				var pending_requests = user.pendingFrom || [];
-				var response = [];
-
-				// Map only important attributes
-				pending_factions = pending_factions.map(function(f){ 
-											return {
-												faction_id : f.id, 
-												sender : f.sender,
-												story  : f.story,
-												fact : f.fact
-											}
-										});
-
-				// Map only the username
-				new_friends = new_friends.map(function(f){ return f.username; });
-				pending_requests = pending_requests.map(function(f){ return f.username; });
-
-				// Delete pendingFactions (the ones that weren't seen before)
-				user.pendingFactions.forEach(function(pendingFaction) {
-					user.pendingFactions.remove(pendingFaction.id);
-				});
-
-				// Delete "newFriends", now that we've noticed the user he's now friends with him
-				user.newFriends.forEach(function(newFriend) {
-					user.newFriends.remove(newFriend.id);
-				});
-
-				// TODO SPRINT 2: RESPONSE
-
-				user.save(function(err, user) {
-					if(err) {
-						sails.log(err);
-						res.status(500).send(err);
-					} else {
-						res.status(200).send({
-							factions 		 : pending_factions,
-							new_friends 	 : new_friends,
-							pending_requests : pending_requests,
-							response    	 : response
-						});
-					}
-				});
-			};
-
-			User.findOne()
-				.where({id : req.user.id})
-				.populate('pendingFactions')
-				.populate('newFriends')
-				.populate('pendingFrom')
-				.then(buildResponse)
-				.catch(function(err) { 
-					sails.log(err);
-					res.status(500).send(err); });
+			return res.status(400).send(Message.createError("No timestamp of last update sent"));
 		}
+
+		if (req.param('viewedFactions')){
+			var sentLastUpdate = req.param('updateTimestamp');
+		}
+		else {
+			return res.status(400).send(Message.createError("No array sent for viewedFactions"));
+		}
+
+		var lastUpdate;
+
+		User.findOne()
+			.where({id: req.user.id})
+			.populate("pendingReceivedRequests")
+			.populate("newFriends")
+			.populate("pendingFactions")
+			.then(function(me) {
+				lastUpdate = me.lastUpdate;
+
+				// Ids of pending friend request users
+				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.recipient; });
+
+				// Ids of the new friends recently made
+				var newFriendsIds = me.newFriends.map(function(f){ return f.newFriend; });
+
+				// Ids of the pending factions
+				var factionIds = me.pendingFactions.map(function(f){ return f.faction; });
+
+				var pendingUsers = User.find({
+						id: pendingReceivedRequestsIds,
+						createdAt: { '>': lastUpdate}
+					}).then(function(pendingFriend) {
+						return pendingFriend;
+					});
+
+				var newFriends = User.find({
+						id: newFriendsIds,
+						createdAt: { '>': lastUpdate}
+					}).then(function(newFriends) {
+						return newFriends;
+					});
+
+				var pendingFactions = Faction.find({
+						id: factionIds,
+						createdAt: { '>': lastUpdate}
+					})
+					.populate('sender')
+					.then(function(pendingFactions) {
+						return pendingFactions;
+					});
+
+				// TODO: INCLUDE createdAt criteria
+				var responses = [];
+
+				var updateTimestamp = new Date();
+
+				return [pendingUsers, newFriends, pendingFactions, responses, updateTimestamp];
+
+			})
+			.spread(function(pendingUsers, newFriends, pendingFactions,
+								responses, updateTimestamp) {
+
+
+				res.status(200).send({
+					pendingUsers: pendingUsers,
+					newFriends: _.pluck(newFriends, 'username'),
+					factionsReceived: factionsReceived,
+					pendingFactions: pendingFactions,
+					responses: responses,
+					updateTimestamp: updateTimestamp
+				});
+			})
+			.catch(function(err){
+				sails.log(err);
+				res.status(500).send(err);
+			});
 	},
 	
 	/********************* FRIEND RELATED ACTIONS *********************/
