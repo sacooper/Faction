@@ -35,7 +35,6 @@ Request body
     - Username already in use, or email already in use
 - Body of response: {id}
     - id is unique identifier (randomly generated)
-    - must be included in all subsequent API calls to be authenticated
 
 ### Change Password
 #### /api/user/update-password (PUT)(+)
@@ -63,7 +62,7 @@ Request body
 }
 ```
 - Success: 200 OK
-    - Contains cooking with session id
+    - Contains cookie with session id
 - Error: 401 Unauthorized
     - Will occur with invalid credentials
 
@@ -119,6 +118,7 @@ Request body
 ## User info flow and update control
 - (1) means data is sent only once
 - (*) means data is sent as long as no action takes place to change it
+
 ### Getting all user information
 #### /api/user/info (GET)(+)
 - Success: 200 OK
