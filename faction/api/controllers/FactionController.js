@@ -122,20 +122,20 @@ module.exports = {
 
 				if(recipientIds.length === 0) {
 					res.status(400).send(Message.createError("No valid recipients sent"));
+				} else {
+					var pendingFactions = [];
+
+					recipientIds.forEach(function(recipientId) {
+						pendingFactions.push(
+							PendingFaction.create({
+								recipient: recipientId
+							})
+							.then(_.identity)
+							.catch(errFct)
+						);
+					});
+					return pendingFactions;
 				}
-
-				var pendingFactions = [];
-
-				recipientIds.forEach(function(recipientId) {
-					pendingFactions.push(
-						PendingFaction.create({
-							recipient: recipientId
-						})
-						.then(_.identity)
-						.catch(errFct)
-					);
-				});
-				return pendingFactions;
 
 			})
 			.spread(function() {

@@ -45,7 +45,7 @@ module.exports = {
     },
     lastUpdate : {
       type: 'datetime',
-      defaultsTo: 'Tue Feb 17 2015 14:44:44 GMT-0500 (EST)'
+      defaultsTo: '2015-02-17T19:44:44.000Z'
     }
   },
 
@@ -99,7 +99,6 @@ module.exports = {
         .then(next)
         .catch(nextErr);
   }
-
 };
 
 // module.exports = User;
