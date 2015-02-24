@@ -13,6 +13,7 @@ module.exports = {
 
 	getAllInfo: function(req, res) {
 		var userId = req.user.id;
+		var lastUpdate;
 
 		User.findOne()
 			.where({id: req.user.id})
@@ -27,6 +28,8 @@ module.exports = {
 
 				var updateTimestamp = new Date();
 
+				var updateTimestamp = new Date();
+				
 				// Ids of pending friend request users
 				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.recipient; });
 
@@ -44,7 +47,6 @@ module.exports = {
 
 				// Array of friends
 				var friends = me.friends;
-
 
 				var pendingUsers = User.find({
 						id: pendingReceivedRequestsIds,
@@ -189,7 +191,6 @@ module.exports = {
 
 				var updatedUser = User.update({id : userId}, {lastUpdate: lastSuccessulUpdate});
 				var updatedPendingFactions = PendingFaction.update({faction: viewedFactions}, {read:true});
-
 
 				// TODO: INCLUDE createdAt criteria
 				var responses = [];
