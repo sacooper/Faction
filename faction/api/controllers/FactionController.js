@@ -54,6 +54,8 @@ module.exports = {
 							}
 							// User has answered it now
 							pFaction.answered = true;
+							pFaction.answeredAt = new Date();
+							pFaction.response = userResponse;
 
 							pFaction.save()
 							.then(function(pFaction) {

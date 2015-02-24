@@ -23,6 +23,7 @@ module.exports = {
 			.populate("factionsReceived")
 			.populate("factionsSent")
 			.populate("pendingFactions")
+			.populate("deletedFactions")
 			.then(function(me) {
 				var lastUpdate = me.lastUpdate || new Date(2000,1,1,0,0,0,0);
 
@@ -50,7 +51,7 @@ module.exports = {
 
 				var pendingUsers = User.find({
 						id: pendingReceivedRequestsIds,
-						createdAt: { '>=': lastUpdate}
+						createdAt: { '>': lastUpdate}
 					}).then(function(pendingFriend) {
 						return pendingFriend;
 					});
@@ -63,16 +64,22 @@ module.exports = {
 					});
 
 				var factionsReceived = Faction.find({
-						id: factionReceivedIds
-					})
+						id: factionReceivedIds,
+						'!': {
+							deletedBy: { 
+								'contains': me.id
+					}}})
 					.populate('sender')
 					.then(function(factionsReceived) {
 						return factionsReceived;
 					});
 
 				var factionsSent = Faction.find({
-						id: factionSentIds
-					})
+						id: factionSentIds,	 
+						'!': {
+							deletedBy: {
+							'contains': me.id
+						}}})
 					.populate('sender')
 					.then(function(factionsSent) {
 						return factionsSent;
@@ -87,19 +94,23 @@ module.exports = {
 						return pendingFactions;
 					});
 
-				// TODO: INCLUDE createdAt criteria
-				var responses = [];
+				var responses = PendingFaction.find({
+						answeredAt: {'>': lastUpdate},
+					}).then(function(responses){
+						return responses;
+					});
 
 
 				return [friends, pendingUsers, newFriends, 
 							factionsReceived, factionsSent, pendingFactions,
-							responses, updateTimestamp];
+							responses, updateTimestamp, me];
 
 			})
 			.spread(function(friends, pendingUsers, newFriends, 
 								factionsReceived, factionsSent, pendingFactions,
-								responses, updateTimestamp) {
+								responses, updateTimestamp, me) {
 
+				sails.log(responses);
 				res.status(200).send({
 					friends : _.pluck(friends, 'username'),
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
@@ -122,7 +133,17 @@ module.exports = {
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story }}),
-					factionResponses: responses,
+					factionResponses: responses.filter(function(resp){
+						return ((!_.some(me.deletedFactions, function(del){
+									return del.id == resp.faction; })) &&	// check if responded to faction is deleted
+							   _.some(me.factionsSent, function(sent){
+							   		return sent.id == resp.faction}));		// Check that faction was sent by user
+						}).map(function(resp){
+							return {
+								factionId: resp.faction,
+								responderUsername: _.find(friends, function(friend){return friend.id == resp.recipient; }).username,
+								response: resp.response
+							}}),
 					updateTimestamp: updateTimestamp
 				});
 			})
@@ -154,6 +175,8 @@ module.exports = {
 			.populate("pendingReceivedRequests")
 			.populate("newFriends")
 			.populate("pendingFactions")
+			.populate("deletedFactions")
+			.populate("factionsSent")
 			.then(function(me) {
 				var lastUpdate = me.lastUpdate || new Date(2000,1,1,0,0,0,0);
 
@@ -190,18 +213,22 @@ module.exports = {
 					});
 
 				var updatedUser = User.update({id : userId}, {lastUpdate: lastSuccessulUpdate});
-				var updatedPendingFactions = PendingFaction.update({faction: viewedFactions}, {read:true});
+				var updatedPendingFactions = PendingFaction.update({faction: viewedFactions}, {read:true, readAt: lastSuccessulUpdate});
 
-				// TODO: INCLUDE createdAt criteria
-				var responses = [];
+				var responses = PendingFaction.find({
+						answeredAt: {'>': lastUpdate},
+					}).then(function(responses){
+						return responses;
+					});
 
 				var updateTimestamp = new Date();
 
-				return [me.friends, pendingUsers, newFriends, pendingFactions, responses, updateTimestamp, updatedUser, updatedPendingFactions];
+				return [me.friends, pendingUsers, newFriends, pendingFactions, responses, updateTimestamp, updatedUser, updatedPendingFactions, me];
 
 			})
 			.spread(function(friends, pendingUsers, newFriends, pendingFactions,
-								responses, updateTimestamp, updatedUser, updatedPendingFactions) {
+								responses, updateTimestamp, updatedUser, updatedPendingFactions, me) {
+				console.log(responses);
 				res.status(200).send({
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
@@ -211,7 +238,17 @@ module.exports = {
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story }}),
-					factionResponses: responses,
+					factionResponses: responses.filter(function(resp){
+						return ((!_.some(me.deletedFactions, function(del){
+									return del.id == resp.faction; })) &&	// check if responded to faction is deleted
+							   _.some(me.factionsSent, function(sent){
+							   		return sent.id == resp.faction}));		// Check that faction was sent by user
+						}).map(function(resp){
+							return {
+								factionId: resp.faction,
+								responderUsername: _.find(friends, function(friend){return friend.id == resp.recipient; }).username,
+								response: resp.response
+							}}),
 					updateTimestamp: updateTimestamp
 				});
 			}).catch(function(err){

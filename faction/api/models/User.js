@@ -46,6 +46,10 @@ module.exports = {
     lastUpdate : {
       type: 'datetime',
       defaultsTo: '2015-02-17T19:44:44.000Z'
+    },
+    deletedFactions: {
+      collection: 'faction',
+      via: 'deletedBy'
     }
   },
 

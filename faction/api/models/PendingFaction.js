@@ -25,7 +25,12 @@ module.exports = {
   	readAt: {
   		type: 'datetime',
       defaultsTo: '2015-02-17T19:44:44.000Z'
-  	}
+  	},
+    answeredAt: {
+      type: 'datetime',
+      defaultsTo: '2015-02-17T19:44:44.000Z'
+    },
+    response: {type: 'boolean'}
   }
 };
 

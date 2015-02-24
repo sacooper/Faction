@@ -31,7 +31,12 @@ module.exports = {
     	type: 'integer'
     },
     story    : { type: 'string' },
-    fact     : { type: 'boolean' }
-  }
+    fact     : { type: 'boolean' },
+    deletedBy: {
+        collection: 'user',
+        via: 'deletedFactions',
+        dominant: true
+    }
+  },
 };
 
