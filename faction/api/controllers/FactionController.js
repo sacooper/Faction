@@ -6,6 +6,31 @@
  */
 
 module.exports = {
+	deleteFaction: function(req, res){
+		var factionId = req.param('factionId');
+
+		if (!factionId){
+			res.status(400).send(Message.createError('You need to provide a faction id'));
+		} else {
+			var userId = req.user.id;
+
+			Faction
+			.findOne({id: factionId})
+			.populate('deletedBy')
+			.then(function(faction){
+				if (_.all(faction.deletedBy, function(u){return u.id != userId; })){
+					faction.deletedBy.add(req.user);
+					faction.save().then(function(updatedFaction){
+						res.status(200).send(Message.createSuccess('1Successfully deleted faction ' + factionId, {}));
+					}).catch( function(err){res.status(500).send(Message.createError(err)); });
+				} else {
+					res.status(200).send(Message.createSuccess('2Successfully deleted faction ' + factionId, {}));
+				}
+			})
+			.catch(function(err){ res.status(500).send(Message.createError(err)); })
+		}
+	},
+
 	respond: function(req, res){
 
 		var errFct = function(err) {

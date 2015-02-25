@@ -39,7 +39,7 @@ module.exports = {
 
 				// Ids of the factions Received
 				var factionReceivedIds = me.factionsReceived.map(function(f){ return f.id; });
-			
+
 				// Ids of the factions Sent
 				var factionSentIds = me.factionsSent.map(function(f){ return f.id; });
 				
@@ -64,28 +64,20 @@ module.exports = {
 					});
 
 				var factionsReceived = Faction.find({
-						id: factionReceivedIds,
-						'!': {
-							deletedBy: { 
-								'contains': me.id
-					}}})
-					.populate('sender')
+						id: _.difference(factionReceivedIds, _.pluck(me.deletedFactions, 'id'))
+					}).populate('sender')
 					.then(function(factionsReceived) {
 						return factionsReceived;
 					});
 
-				var factionsSent = Faction.find({
-						id: factionSentIds,	 
-						'!': {
-							deletedBy: {
-							'contains': me.id
-						}}})
-					.populate('sender')
+				var factionsSent = Faction.find().where({
+						id: _.difference(factionSentIds, _.pluck(me.deletedFactions, 'id'))
+					}).populate('sender')
 					.then(function(factionsSent) {
 						return factionsSent;
 					});
 
-				var pendingFactions = Faction.find({
+				var pendingFactions = Faction.find().where({
 						id: factionIds,
 						createdAt: { '>': lastUpdate}
 					})
@@ -110,7 +102,6 @@ module.exports = {
 								factionsReceived, factionsSent, pendingFactions,
 								responses, updateTimestamp, me) {
 
-				sails.log(responses);
 				res.status(200).send({
 					friends : _.pluck(friends, 'username'),
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
@@ -123,13 +114,14 @@ module.exports = {
 							story : f.story }}),
 					factionsSent: factionsSent.map(function(f){
 						return {
-							recipients : f.recipients.map(function(r){ return _.find(friends, function(friend){ return friend.id == r.id; }).username;}),
+							recipients : f.recipients.map(function(r){ 
+									return  _.find(friends, function(friend){ return friend.id == r; }).username}),
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story }}),
 					pendingFactions: pendingFactions.map(function(f){
 						return {
-							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
+							sender : _.find(friends, function(friend){return friend.id == f.sender; }).username,
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story }}),

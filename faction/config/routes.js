@@ -43,6 +43,7 @@ module.exports.routes = {
   /** Faction related routes **/
   'post /api/factions/send'         : 'FactionController.create',
   'post /api/factions/respond'      : 'FactionController.respond',
+  'post /api/factions/delete'       : 'FactionController.deleteFaction',
 
   /** User info flow and update control routes **/
   'get  /api/user/info'              : 'UserController.getAllInfo',

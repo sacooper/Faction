@@ -113,7 +113,22 @@ Request body
     - Error returned
 
 ### Deleting a faction
-- TODO
+#### /api/factions/delete (POST)(+)
+Request Body
+```javascript
+{
+    factionId: "Unique faction ID"
+}
+```
+- Not that if a delete request is sent to a faction that is already deleted, no change will be made.
+- Success: 200 OK
+    - data attribute: empty
+- Error: 400 Bad Request
+    - Tried to delete a faction that does not exist (invalid factionId)
+    - No factionId provided
+- Error 500 Internal Server Error
+    - Error returned
+
 
 ## User info flow and update control
 - (1) means data is sent only once
