@@ -546,9 +546,10 @@ module.exports = {
 		.where({id: req.user.id})
 		.populate("factionsReceived")
 		.populate("factionsSent")
+		.populate("deletedFactions")
 		.then(function(me) {
 
-			var senderIds = _.pluck(me.factionsReceived, 'sender');
+			var senderIds = _.difference(_.pluck(me.factionsReceived, 'sender'), _.pluck(me.deletedFactions, 'id'));
 
 			User.find({id: senderIds})
 			.then(function(users){
@@ -561,7 +562,9 @@ module.exports = {
 					})
 				});
 	
-				var sent = me.factionsSent.map(function(faction) {
+				var sent = me.factionsSent
+					.filter(function(faction){return _.every(me.deletedFactions, function(d){ return d.id != faction.id; });})
+					.map(function(faction) {
 					return {
 						sender: faction.sender,
 						story: faction.story,
@@ -570,7 +573,9 @@ module.exports = {
 					}
 				});
 
-				var received = me.factionsReceived.map(function(faction) {
+				var received = me.factionsReceived
+					.filter(function(faction){return _.every(me.deletedFactions, function(d){ return d.id != faction.id; });})
+					.map(function(faction) {
 					return {
 						sender: faction.sender,
 						story: faction.story,
