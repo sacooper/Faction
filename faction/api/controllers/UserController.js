@@ -123,7 +123,7 @@ module.exports = {
 							createdAt: f.createdAt }}),
 					pendingFactions: pendingFactions.map(function(f){
 						return {
-							sender : _.find(friends, function(friend){return friend.id == f.sender; }).username,
+							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story,
