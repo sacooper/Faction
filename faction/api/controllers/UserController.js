@@ -625,7 +625,12 @@ module.exports = {
 			res.status(200).send(
 				Message.createSuccess(
 					"Search successful", 
-					_.pluck(users, 'username')
+					users.map(function(u){
+						return {
+							'username': u.username,
+							'email': u.email
+						}
+					})
 				)
 			);
 		};

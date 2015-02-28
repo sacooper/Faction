@@ -282,6 +282,12 @@ Request body
 - Optional query parameter search=""
     - search parameter to match all users in database
 - Success: 200 OK
-    - data attribute contains a JSON array, containing list of usernames that match the search parameter (or all usernames if search parameter is empty)
+    - data attribute contains an array of JSON objects of the form:
+```
+{
+    "username": "user",
+    "email": "email@example.com"
+}
+```
 - Error: 500 Internal Server Error
     - error returned

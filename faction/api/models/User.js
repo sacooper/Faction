@@ -99,7 +99,10 @@ module.exports = {
   },
 
   search: function(str, next, nextErr){
-    User.find({username: {'contains': str}})
+    User.find({
+      or: [
+        {email: {'contains': str}},
+        {username: {'contains': str}}]})
         .then(next)
         .catch(nextErr);
   }
