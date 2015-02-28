@@ -111,20 +111,23 @@ module.exports = {
 							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
 							factionId: f.id,
 							fact : f.fact,
-							story : f.story }}),
+							story : f.story,
+							createdAt: f.createdAt }}),
 					factionsSent: factionsSent.map(function(f){
 						return {
 							recipients : f.recipients.map(function(r){ 
 									return  _.find(friends, function(friend){ return friend.id == r; }).username}),
 							factionId: f.id,
 							fact : f.fact,
-							story : f.story }}),
+							story : f.story,
+							createdAt: f.createdAt }}),
 					pendingFactions: pendingFactions.map(function(f){
 						return {
 							sender : _.find(friends, function(friend){return friend.id == f.sender; }).username,
 							factionId: f.id,
 							fact : f.fact,
-							story : f.story }}),
+							story : f.story,
+							createdAt: f.createdAt }}),
 					factionResponses: responses.filter(function(resp){
 						return ((!_.some(me.deletedFactions, function(del){
 									return del.id == resp.faction; })) &&	// check if responded to faction is deleted
@@ -229,7 +232,8 @@ module.exports = {
 							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
 							factionId: f.id,
 							fact : f.fact,
-							story : f.story }}),
+							story : f.story,
+							createdAt: f.createdAt }}),
 					factionResponses: responses.filter(function(resp){
 						return ((!_.some(me.deletedFactions, function(del){
 									return del.id == resp.faction; })) &&	// check if responded to faction is deleted

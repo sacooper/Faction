@@ -143,8 +143,8 @@ Response body
     friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
-    factionsReceived: [], // (*) array of {sender, story, fact, factionId}
-    factionsSent: [], // (*) an array of {sender, story, fact, factionId}
+    factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt}
+    factionsSent: [], // (*) an array of {sender, story, fact, factionId, createdAt}
     pendingFactions: [], // (*) an array of {sender, story, fact, factionId}
     /* 
         For factionsReceived, factionsSent and pendingFactions
@@ -152,6 +152,7 @@ Response body
         - story is a string
         - fact is a boolean
         - factionId is string
+        - createdAt is a date
     */
     factionResponses: [], // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 
@@ -182,6 +183,7 @@ Response body
         story is a string
         fact is a boolean
         factionId is string
+        createdAt is a date
     */
     factionResponses: [],       // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 
