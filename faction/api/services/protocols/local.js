@@ -51,9 +51,9 @@ exports.register = function (req, res, next) {
       sails.log(err.code);
       if (err.code === 'E_VALIDATION') {
         if (err.invalidAttributes.email) {
-          return res.json({error: "Email already exists"});
+          return res.status(400).send(Message.createError("Email already exists"));
         } else if(err.invalidAttributes.username) {
-          return res.json({error: "Username already exists"});
+          return res.status(400).send(Message.createError("Username already exists"));
         } else {
           return res.status(500).send('');
         }
