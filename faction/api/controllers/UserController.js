@@ -119,9 +119,9 @@ module.exports = {
 						}
 					}).filter(function(f) { return typeof f !== 'undefined'; }),
 					factionsSent: factionsSent.map(function(f){
-						var recipient = _.find(friends, function(friend){ return friend.id == r; });
 						return {
 							recipients : f.recipients.map(function(r){ 
+								var recipient = _.find(friends, function(friend){ return friend.id == r; });
 								if(recipient) {
 									return recipient.username;
 								}
@@ -129,7 +129,8 @@ module.exports = {
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story,
-							createdAt: f.createdAt }}),
+							createdAt: f.createdAt }
+						}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
 						if(friendSender) {
