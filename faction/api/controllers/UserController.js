@@ -32,7 +32,7 @@ module.exports = {
 				var updateTimestamp = new Date();
 				
 				// Ids of pending friend request users
-				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.recipient; });
+				var pendingReceivedRequestsIds = me.pendingReceivedRequests.map(function(f) {return f.sender; });
 
 				// Ids of the new friends recently made
 				var newFriendsIds = me.newFriends.map(function(f){ return f.newFriend; });
@@ -107,43 +107,61 @@ module.exports = {
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
 					factionsReceived: factionsReceived.map(function(f){
-						return {
-							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
-							factionId: f.id,
-							fact : f.fact,
-							story : f.story,
-							createdAt: f.createdAt }}),
+						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
+						if(friendSender) {
+							return {
+								sender : friendSender.username,
+								factionId : f.id,
+								fact : f.fact,
+								story : f.story,
+								createdAt: f.createdAt 
+							};
+						}
+					}).filter(function(f) { return typeof f !== 'undefined'; }),
 					factionsSent: factionsSent.map(function(f){
+						var recipient = _.find(friends, function(friend){ return friend.id == r; });
 						return {
 							recipients : f.recipients.map(function(r){ 
-									return  _.find(friends, function(friend){ return friend.id == r; }).username}),
+								if(recipient) {
+									return recipient.username;
+								}
+							}).filter(function(f) { return typeof f !== 'undefined'; }),
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story,
 							createdAt: f.createdAt }}),
 					pendingFactions: pendingFactions.map(function(f){
-						return {
-							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
-							factionId: f.id,
-							fact : f.fact,
-							story : f.story,
-							createdAt: f.createdAt }}),
+						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
+						if(friendSender) {
+							return {
+								sender : friendSender.username,
+								factionId : f.id,
+								fact : f.fact,
+								story : f.story,
+								createdAt: f.createdAt 
+							};
+						}
+					}).filter(function(f) { return typeof f !== 'undefined'; }),
 					factionResponses: responses.filter(function(resp){
 						return ((!_.some(me.deletedFactions, function(del){
 									return del.id == resp.faction; })) &&	// check if responded to faction is deleted
 							   _.some(me.factionsSent, function(sent){
-							   		return sent.id == resp.faction}));		// Check that faction was sent by user
+							   		return sent.id == resp.faction; }));		// Check that faction was sent by user
 						}).map(function(resp){
-							return {
-								factionId: resp.faction,
-								responderUsername: _.find(friends, function(friend){return friend.id == resp.recipient; }).username,
-								response: resp.response
-							}}),
+							var resp = _.find(friends, function(friend){ return friend.id == resp.recipient; });
+							if(resp) {
+								return {
+									factionId: resp.faction,
+									responderUsername: resp.username,
+									response: resp.response
+								}
+							}
+						}).filter(function(f) { return typeof f !== 'undefined'; }),
 					updateTimestamp: updateTimestamp
 				});
 			})
-			.catch(function(err)
-{				res.status(500).send(Message.createError(err));
+			.catch(function(err){
+				res.status(500).send(Message.createError(err));
 			});
 	},
 
@@ -223,28 +241,37 @@ module.exports = {
 			})
 			.spread(function(friends, pendingUsers, newFriends, pendingFactions,
 								responses, updateTimestamp, updatedUser, updatedPendingFactions, me) {
-				console.log(responses);
+
 				res.status(200).send({
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
 					pendingFactions: pendingFactions.map(function(f){
-						return {
-							sender : _.find(friends, function(friend){return friend.id == f.sender.id; }).username,
-							factionId: f.id,
-							fact : f.fact,
-							story : f.story,
-							createdAt: f.createdAt }}),
+						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
+						if(friendSender) {
+							return {
+								sender : friendSender.username,
+								factionId : f.id,
+								fact : f.fact,
+								story : f.story,
+								createdAt: f.createdAt 
+							};
+						}
+					}).filter(function(f) { return typeof f !== 'undefined'; }),
 					factionResponses: responses.filter(function(resp){
 						return ((!_.some(me.deletedFactions, function(del){
 									return del.id == resp.faction; })) &&	// check if responded to faction is deleted
 							   _.some(me.factionsSent, function(sent){
-							   		return sent.id == resp.faction}));		// Check that faction was sent by user
+							   		return sent.id == resp.faction; }));		// Check that faction was sent by user
 						}).map(function(resp){
-							return {
-								factionId: resp.faction,
-								responderUsername: _.find(friends, function(friend){return friend.id == resp.recipient; }).username,
-								response: resp.response
-							}}),
+							var resp = _.find(friends, function(friend){ return friend.id == resp.recipient; });
+							if(resp) {
+								return {
+									factionId: resp.faction,
+									responderUsername: resp.username,
+									response: resp.response
+								}
+							}
+						}).filter(function(f) { return typeof f !== 'undefined'; }),
 					updateTimestamp: updateTimestamp
 				});
 			}).catch(function(err){

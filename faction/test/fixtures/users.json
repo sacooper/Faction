@@ -1,0 +1,8 @@
+[
+	{
+	    "email": "some@email.com", 
+	    "password": "somepassword", 
+	    "username": "someusername",
+	    "action": "register"
+	}
+]

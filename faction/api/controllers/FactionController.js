@@ -181,7 +181,10 @@ module.exports = {
 					fact: fact
 				})
 				.then(function(faction) {
-					res.status(201).send(Message.createSuccess('Successfully sent the faction', {factionId: faction.id}));
+					res.status(201).send(Message.createSuccess('Successfully sent the faction', {
+						factionId: faction.id,
+						createdAt: faction.createdAt
+					}));
 				})
 				.catch(errFct)
 			})
