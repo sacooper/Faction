@@ -134,6 +134,7 @@ module.exports = {
 						}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
+						console.log(f);
 						if(friendSender && !f.status.read && !f.status.answered) {
 							return {
 								sender : friendSender.username,
