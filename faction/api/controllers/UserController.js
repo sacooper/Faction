@@ -133,7 +133,7 @@ module.exports = {
 						}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender) {
+						if(friendSender && !f.read && !f.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
@@ -248,7 +248,7 @@ module.exports = {
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender) {
+						if(friendSender && !f.read && !f.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
