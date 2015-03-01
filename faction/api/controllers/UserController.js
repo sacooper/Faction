@@ -82,6 +82,7 @@ module.exports = {
 						createdAt: { '>': lastUpdate}
 					})
 					.populate('sender')
+					.populate('status')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
@@ -133,7 +134,7 @@ module.exports = {
 						}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender && !f.read && !f.answered) {
+						if(friendSender && !f.status.read && !f.status.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
@@ -222,6 +223,7 @@ module.exports = {
 						createdAt: { '>': lastUpdate}
 					})
 					.populate('sender')
+					.populate('status')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
@@ -248,7 +250,7 @@ module.exports = {
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender && !f.read && !f.answered) {
+						if(friendSender && !f.status.read && !f.status.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
