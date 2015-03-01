@@ -317,7 +317,7 @@ module.exports = {
 							newFriend: me.id
 						})
 						.then(function(fReq) {
-							res.status(200).send(Message.createSuccess(friend.username + ' already added you, therefore you are now friends'), {});
+							return res.status(200).send(Message.createSuccess(friend.username + ' already added you, therefore you are now friends'), {});
 
 						})
 						.catch(errFct);;
