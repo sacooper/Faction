@@ -463,7 +463,7 @@ module.exports = {
 							recipient: me.id
 						})
 						.then(function(pfr) {
-							if(accepted === "true") {
+							if(accepted) {
 
 								me.friends.add(friend.id);
 
