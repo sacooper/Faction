@@ -144,11 +144,12 @@ Response body
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
     factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt}
-    factionsSent: [], // (*) an array of {sender, story, fact, factionId, createdAt}
+    factionsSent: [], // (*) an array of {recipients, story, fact, factionId, createdAt}
     pendingFactions: [], // (*) an array of {sender, story, fact, factionId}
     /* 
         For factionsReceived, factionsSent and pendingFactions
         - sender is a username string
+            - recipients is an array of strings
         - story is a string
         - fact is a boolean
         - factionId is string
