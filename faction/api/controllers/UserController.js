@@ -82,6 +82,7 @@ module.exports = {
 						createdAt: { '>': lastUpdate}
 					})
 					.populate('sender')
+					.populate('status')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
@@ -133,7 +134,8 @@ module.exports = {
 						}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender) {
+						var myPfStatus = _.find(f.status, function(pf) { return pf.recipient === userId }) || {};
+						if(friendSender && !myPfStatus.read && !myPfStatus.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
@@ -222,6 +224,7 @@ module.exports = {
 						createdAt: { '>': lastUpdate}
 					})
 					.populate('sender')
+					.populate('status')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
@@ -248,7 +251,8 @@ module.exports = {
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
-						if(friendSender) {
+						var myPfStatus = _.find(f.status, function(pf) { return pf.recipient === userId }) || {};
+						if(friendSender && !myPfStatus.read && !myPfStatus.answered) {
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
