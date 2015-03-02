@@ -514,6 +514,8 @@ module.exports = {
 	deleteFriend: function(req, res) {
 		var friendUsername = req.param('username');
 
+		console.log("Trying to delete friend with username: " + friendUsername);
+
 		var errFct = function(err) {
 			return res.status(500).send(Message.createError(err));
 		};
@@ -529,7 +531,9 @@ module.exports = {
 			.populate('friends')
 			.then(function(friend) {
 
-				if(me.id === friend.id){
+				console.log("Friend object is: ", friend);
+
+				if(me.id === friend.id) {
 					res.status(400).send(
 						Message.createError("You are trying to remove yourself...")
 					);
