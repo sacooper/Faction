@@ -415,7 +415,7 @@ module.exports = {
 								sender: myId
 							})
 							.then(function(pReq) {
-								res.status(200).send(Message.createSuccess("Successfully posted a friend request"), null);
+								res.status(201).send(Message.createSuccess("Successfully posted a friend request"), {}});
 							})
 							.catch(errFct);;
 						}
