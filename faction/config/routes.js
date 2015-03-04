@@ -59,6 +59,13 @@ module.exports.routes = {
   'get /api/user/friends'           : 'UserController.friends', 
   'get /api/user/factions'          : 'UserController.factions',
 
+  /** Group related routes **/
+  'post /api/group/create'          : 'GroupController.create',
+  'post /api/group/add-friend'      : 'GroupController.addFriend',
+  'delete /api/group/remove'        : 'GroupController.removeGroup',
+  'delete /api/group/remove-friend' : 'GroupController.removeFriendFromGroup',
+
+  
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *

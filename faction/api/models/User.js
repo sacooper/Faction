@@ -50,7 +50,11 @@ module.exports = {
     deletedFactions: {
       collection: 'faction',
       via: 'deletedBy'
-    }
+    },
+    groups: {
+      collection: 'group',
+      via: 'craetor'
+    },
   },
 
   /**
