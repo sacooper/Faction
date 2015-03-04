@@ -266,7 +266,7 @@ Request body
 ## User utilities
 ### Getting all factions related to user
 #### /api/user/factions (GET)(+)
-- Success; 200 OK
+- Success: 200 OK
     - data attribute of body contains JSON object {sent: [], received: []}
         - sent is an array of {sender: username string,story,fact,id}
         - received is an array of {sender: your user id,story,fact,id}
@@ -294,3 +294,74 @@ Request body
 ```
 - Error: 500 Internal Server Error
     - error returned
+
+## Groups
+### Create a Group
+#### /api/group/create (POST)(+)
+- JSON object containing name of group, and OPTIONAL array of friends in the group
+```
+{
+    "name": "",   // REQUIRED: Name of group
+    "friends": [] // OPTIONAL: Friends in the group
+}
+```
+- Success: 200 OK
+    - data attribute:
+        ```
+        {
+            "groupId": "",       // users groupID
+        }
+        ```
+- Error: 400 Bad Request
+    - No name included for group
+- Error: 500 Internal Server Error
+    - error returned
+
+### Add a Friend to a Group
+#### /api/group/add-friend (POST)(+)
+- JSON object containing groupId and name of friend
+```
+{
+    "groupId": "",      // REQUIRED: groupId
+    "friend": ""        // Name of friend to add to group
+}
+```
+- Success: 200 OK
+    - successfully added friend to the group
+- Error: 400 Bad Request
+    - groupId is invalid
+    - friend is not a friend of the user
+- Error: 500 Internal Server Error
+    - Error returned
+
+### Remove a Group
+#### /api/group/remove (DELETE)(+)
+- JSON object containing groupId of group to delete
+```
+{
+    "groupId": ""       // REQUIRED: groupId of group to delete
+}
+```
+- Success: 200 OK
+    - successfully deleted group
+- Error: 400 Bad Request
+    - groupId is invalid
+- Error: 500 Internal Server Error
+    - Error returned
+
+### Remove a friend from a group
+#### /api/group/remove-friend (DELETE)(+)
+- JSON object containing groupId of group to delete
+```
+{
+    "groupId": "",      // REQUIRED: groupId 
+    "friend": "",       // REQUIRED: friend to remove from group
+}
+```
+- Success: 200 OK
+    - successfully removed friend from the group
+- Error: 400 Bad Request
+    - groupId is invalid
+    - friend is not a friend of the user
+- Error: 500 Internal Server Error
+    - Error returned
