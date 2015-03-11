@@ -711,6 +711,40 @@ module.exports = {
 		}
 
 		User.search(str, next, nextErr);
+	},
+
+	topThree: function(req, res){
+		var catchErr = function(err){res.status(500).send(err);};
+
+		User.findOne({id: req.user.id})
+			.populate('friends')
+			.populate('factionsSent')
+			.then(function(me){
+				var counts = [];
+
+				me.friends.forEach(function(friend){
+					var count = 
+						Faction.count({sender: me.id, recipients: friend.id})
+							.then(function(cnt){
+								return {
+									username: friend.username,
+									count: cnt
+								}
+							}).catch(catchErr)
+						counts.push(count);
+				});
+				return counts;
+			})
+			.spread(function() {
+				var friendCounts = Array.prototype.slice.call(arguments);
+				res.status(200).send(Message.createSuccess(
+					"Top Friends",
+					{
+						topThree: _.pluck(
+									_.take(
+										_.sortBy(friendCounts, function(f){return -f.count;}), 3), 'username')
+					}))
+			}).catch(catchErr)
 	}
 
 };

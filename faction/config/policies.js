@@ -49,7 +49,8 @@ module.exports.policies = {
     deleteFriend          : ['passport', 'sessionAuth'],
     friends               : ['passport', 'sessionAuth'],
     getAllInfo            : ['passport', 'sessionAuth'],
-    factions              : ['passport', 'sessionAuth']
+    factions              : ['passport', 'sessionAuth'],
+    topThree              : ['passport', 'sessionAuth']
   },
 
   AuthController : {
