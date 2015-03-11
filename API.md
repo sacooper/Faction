@@ -316,6 +316,20 @@ Request body
 - Error: 500 Internal Server Error
     - return error
 
+### Getting top 3 friends
+#### /api/user/top-three (GET)
+- No query parameters required
+- Success: 200 OK
+    - Response:
+        ```
+        {
+            topThree: ["usernameNumber1", "usernameNumber2", "usernameNumber3"] 
+        }
+        ```
+    - If user has fewer than 3 friends, then the top 1 or 2 friends are shown, also in order
+- Error: 500 Internal Server Error
+    - return error
+
 ## User utilities
 ### Getting all factions related to user
 #### /api/user/factions (GET)(+)
