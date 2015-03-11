@@ -79,7 +79,8 @@ Request body
 {
     to:["username1", "username2", "..."], // array of usernames
     faction : "The story itself",
-    fact: true // or false, boolean type
+    fact: true, // or false, boolean type
+    commentsEnabled: true // or false, boolean type, (optional, if not sent, assumed to be true)
 } 
 ```
 - Success: 201 Created
@@ -120,7 +121,7 @@ Request Body
     factionId: "Unique faction ID"
 }
 ```
-- Not that if a delete request is sent to a faction that is already deleted, no change will be made.
+- Note that if a delete request is sent to a faction that is already deleted, no change will be made.
 - Success: 200 OK
     - data attribute: empty
 - Error: 400 Bad Request
@@ -129,6 +130,53 @@ Request Body
 - Error 500 Internal Server Error
     - Error returned
 
+### Posting a comment to a faction
+#### /api/factions/add-comment (POST)
+Request body
+
+```javascript
+{
+    factionId: "Unique faction ID",
+    username: "Username of the sender of the comment",
+    content: "Content of the comment to be posted on the faction."
+}
+```
+
+- Success: 201 created
+Response body
+
+```javascript
+{
+    commentId: "Unique comment ID",
+}
+```
+- Error: 400 Bad Request
+    - invalid faction ID
+    - username not part of the faction recipients
+    - content is empty (if it only contains spaces, tabs, newlines is also considered empty)
+    - content is too big, max length is 1000 characters.
+- Error 500 Internal Server Error
+    - Error returned
+
+
+### Enabling and disabling of comments in a faction
+#### /api/factions/enable-comment (PUT)
+Request body
+```javascript
+{
+    factionId: "Unique faction ID",
+    enabled: true // or false, as a boolean type
+}
+```
+
+- Success: 200 OK
+Response body
+- Error: 400 Bad Request
+    - invalid faction ID
+    - enabled was not sent
+    - user is not the owner (sender) of that faction.
+- Error 500 Internal Server Error
+    - Error returned
 
 ## User info flow and update control
 - (1) means data is sent only once
@@ -138,6 +186,7 @@ Request Body
 #### /api/user/info (GET)(+)
 - Success: 200 OK
 Response body
+
 ```javascript
 {
     groups: [],  // (*) array of the users groups {name, groupId, friends}
@@ -175,6 +224,7 @@ Response body
     - viewedFactions is an array of faction IDs from pendingFactions that were seen by the user
 - Success: 200 OK
 Response body
+
 ```javascript
 {
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
@@ -366,3 +416,5 @@ Request body
     - friend is not a friend of the user
 - Error: 500 Internal Server Error
     - Error returned
+
+
