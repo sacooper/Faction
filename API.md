@@ -202,6 +202,7 @@ Response body
             - recipients is an array of strings
         - story is a string
         - fact is a boolean
+        - commentsEnabled is a boolean
         - factionId is string
         - createdAt is a date
     */
@@ -235,6 +236,7 @@ Response body
         story is a string
         fact is a boolean
         factionId is string
+        commentsEnabled is a boolean
         createdAt is a date
     */
     factionResponses: [],       // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
@@ -319,8 +321,8 @@ Request body
 #### /api/user/factions (GET)(+)
 - Success: 200 OK
     - data attribute of body contains JSON object {sent: [], received: []}
-        - sent is an array of {sender: username string,story,fact,id}
-        - received is an array of {sender: your user id,story,fact,id}
+        - sent is an array of {sender: username string,story,fact,id, commentsEnabled, createdAt}
+        - received is an array of {sender: your user id,story,fact,id, commentsEnabled, createdAt}
 - Error: 500 Internal Server Error
     - error returned
 
