@@ -34,7 +34,7 @@ module.exports = {
 									friendsInGroup: friendsInGroup
 								}).then(function(group){
 									res.status(200).send(
-										Message.createSuccess("Successfully created group" + name, {groupId: group.id}));
+										Message.createSuccess("Successfully created group " + name, {groupId: group.id}));
 								}).catch(function(err){
 									res.status(500).send(Message.createError(err));
 								});
@@ -52,7 +52,49 @@ module.exports = {
 	},
 
 	addFriend: function(req, res){
+		var groupId = req.param('groupId');
+		var friendUsername = req.param('friend');
+		var catchErr = function(err){res.status(500).send(Message.createError(err));};
 
+		if (!groupId){
+			res.status(400).send(Message.createError("No group id"));
+		} else if (!friendUsername){
+			res.status(400).send(Message.createError("No friend to add included"));
+		} else {
+			Group.findOne(groupId)
+				.populate('friendsInGroup')
+				.then(function(group){
+					var me = User.findOne({id: req.user.id})
+								.populate('friends')
+								.populate('groups')
+								.then(_.identity)
+								.catch(catchErr);
+					return [group, me];
+				}).spread(function(group, me){
+					if (group.creator == me.id){
+						var friend = _.find(me.friends, function(f){return f.username == friendUsername});
+						if (friend){
+							if (_.some(group.friendsInGroup, function(f){return f.id == friend.id; })){
+								res.status(200).send(Message.createSuccess(
+											friendUsername + " is already in group " + group.name, {}));
+							} else {
+								group.friendsInGroup.push(friend);
+								sails.log(group);
+								group.save()
+									.then(function(grp){
+										res.status(200).send(Message.createSuccess(
+											"Successfully added " + friendUsername + " to group " + group.name, {}));
+									})
+									.catch(catchErr);
+							}
+						} else {
+							res.status(400).send(Message.createError("Friend username sent was invalid"));
+						}
+					} else {
+						res.status(400).send(Message.createError("Invalid groupId: group not created by user"));
+					}
+				}).catch(catchErr);
+		}
 	},
 
 	removeGroup: function(req, res){
