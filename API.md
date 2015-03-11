@@ -140,6 +140,7 @@ Request Body
 Response body
 ```javascript
 {
+    groups: [],  // (*) array of the users groups {name, groupId, friends}
     friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
@@ -302,7 +303,7 @@ Request body
 ```
 {
     "name": "",   // REQUIRED: Name of group
-    "friends": [] // OPTIONAL: Friends in the group
+    "friends": [] // OPTIONAL: Friends in the group, passed as usernames
 }
 ```
 - Success: 200 OK

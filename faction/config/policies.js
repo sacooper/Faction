@@ -42,22 +42,29 @@ module.exports.policies = {
   },
 
   UserController: {
-    search              : ['passport', 'sessionAuth'],
-    update              : ['passport', 'sessionAuth'],
-    addFriend           : ['passport', 'sessionAuth'],
-    acceptFriendRequest : ['passport', 'sessionAuth'],
-    deleteFriend        : ['passport', 'sessionAuth'],
-    friends             : ['passport', 'sessionAuth'],
-    getAllInfo          : ['passport', 'sessionAuth'],
-    factions            : ['passport', 'sessionAuth']
+    search                : ['passport', 'sessionAuth'],
+    update                : ['passport', 'sessionAuth'],
+    addFriend             : ['passport', 'sessionAuth'],
+    acceptFriendRequest   : ['passport', 'sessionAuth'],
+    deleteFriend          : ['passport', 'sessionAuth'],
+    friends               : ['passport', 'sessionAuth'],
+    getAllInfo            : ['passport', 'sessionAuth'],
+    factions              : ['passport', 'sessionAuth']
   },
 
   AuthController : {
-    logout              : ['passport'],
-    updatepassword      : ['passport', 'sessionAuth'],
-    login               : ['passport', 'notLoggedIn'],
-    register            : ['passport', 'notLoggedIn'],
-    callback            : ['passport', 'notLoggedIn'],
+    logout                : ['passport'],
+    updatepassword        : ['passport', 'sessionAuth'],
+    login                 : ['passport', 'notLoggedIn'],
+    register              : ['passport', 'notLoggedIn'],
+    callback              : ['passport', 'notLoggedIn'],
+  },
+
+  GroupController: {
+    create                : ['passport', 'sessionAuth'],
+    addFriend             : ['passport', 'sessionAuth'],
+    removeGroup           : ['passport', 'sessionAuth'],
+    removeFriendFromGroup : ['passport', 'sessionAuth'],
   }
 
 

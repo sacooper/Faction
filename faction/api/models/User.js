@@ -53,7 +53,7 @@ module.exports = {
     },
     groups: {
       collection: 'group',
-      via: 'craetor'
+      via: 'creator',
     },
   },
 

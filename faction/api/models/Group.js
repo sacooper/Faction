@@ -9,12 +9,12 @@ module.exports = {
 
 	attributes: {
 		name  : { 
-			type: 'string'
+			type: 'string',
 		},
 		creator: {
 			model: 'user'
 		},
-		friends: {
+		friendsInGroup: {
 			collection: 'user'
 		}
 	}
