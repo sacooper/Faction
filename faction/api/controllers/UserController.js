@@ -24,6 +24,7 @@ module.exports = {
 			.populate("factionsSent")
 			.populate("pendingFactions")
 			.populate("deletedFactions")
+			.populate("groups")
 			.then(function(me) {
 				var lastUpdate = me.lastUpdate || new Date(2000,1,1,0,0,0,0);
 
@@ -93,17 +94,31 @@ module.exports = {
 						return responses;
 					});
 
+				var groups = Group.find({
+						id: _.pluck(me.groups, 'id')
+					})
+					.populate('friendsInGroup')
+					.then(_.identity);
 
 				return [friends, pendingUsers, newFriends, 
 							factionsReceived, factionsSent, pendingFactions,
-							responses, updateTimestamp, me];
+							responses, updateTimestamp, me, groups];
 
 			})
 			.spread(function(friends, pendingUsers, newFriends, 
 								factionsReceived, factionsSent, pendingFactions,
-								responses, updateTimestamp, me) {
+								responses, updateTimestamp, me, groups) {
 
 				res.status(200).send({
+					groups: groups.map(function(grp){
+						return {
+							name: grp.name,
+							groupId: grp.id,
+							friends: grp.friendsInGroup.map(function(f){
+								return f.username;
+							})
+							// .filter(function(f) { return typeof f !== 'undefined'; })
+						};}),
 					friends : _.pluck(friends, 'username'),
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
 					acceptedFriendRequests: _.pluck(newFriends, 'username'),
@@ -511,7 +526,7 @@ module.exports = {
 		.catch(errFct);
 	},
 
-	deleteFriend: function(req, res) {
+	deleteFriend: function(req, res){
 		var friendUsername = req.param('username');
 
 		var errFct = function(err) {
@@ -522,13 +537,22 @@ module.exports = {
 			id: req.user.id
 		})
 		.populate('friends')
+		.populate('groups')
 		.then(function(me){
 			User.findOne({
 				username: friendUsername
 			})
 			.populate('friends')
 			.then(function(friend) {
-
+				var groups = Group.find({
+						id : _.pluck(me.groups, 'id')
+					})
+					.populate('friendsInGroup')
+					.then(_.identity)
+					.catch(errFct);
+				return [groups, friend, me];
+			})
+			.spread(function(groups, friend, me){
 				if(me.id === friend.id) {
 					res.status(400).send(
 						Message.createError("You are trying to remove yourself...")
@@ -539,7 +563,6 @@ module.exports = {
 				{
 					me.friends.remove(friend.id);
 					friend.friends.remove(me.id);
-					
 					me.save()
 						.then(function(me){
 						friend.save()
@@ -553,6 +576,18 @@ module.exports = {
 								newFriend: [me.id, friend.id]
 							})
 							.then(function(afr) {
+								var updatedGroups = [];
+
+								groups.forEach(function(grp){
+									grp.friendsInGroup.remove(friend.id);
+									var updated = grp.save().then(_.identity).catch(errFct);
+									updatedGroups.push(updated);
+								});
+
+								return updatedGroups;
+							})
+							.spread(function() {
+								var updatedGroups = Array.prototype.slice.call(arguments);
 								res.status(200).send(
 									Message.createSuccess("Successfully removed " + friend.username + " from your friend's list.", {})
 								);

@@ -79,7 +79,6 @@ module.exports = {
 											friendUsername + " is already in group " + group.name, {}));
 							} else {
 								group.friendsInGroup.push(friend);
-								sails.log(group);
 								group.save()
 									.then(function(grp){
 										res.status(200).send(Message.createSuccess(
@@ -98,11 +97,11 @@ module.exports = {
 	},
 
 	removeGroup: function(req, res){
-
+		res.status(500).send(Message.createError("TODO: Unimplemented"));
 	},
 
 	removeFriendFromGroup: function(req, res){
-		
+		res.status(500).send(Message.createError("TODO: Unimplemented"));
 	}
 };
 
