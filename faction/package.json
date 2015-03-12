@@ -28,6 +28,7 @@
     "sails": "^0.10.5",
     "sails-disk": "^0.10.4",
     "sails-mongo": "^0.10.5",
+    "skipper-disk": "^0.5.4",
     "validator": "^3.27.0"
   },
   "devDependencies": {

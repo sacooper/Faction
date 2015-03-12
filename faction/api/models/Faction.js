@@ -24,6 +24,9 @@ module.exports = {
     	collection: 'comment',
     	via: 'faction'
     },
+    imageUrl: {
+        type: 'string'
+    },
     trueResponses : {
     	type: 'integer'
     },

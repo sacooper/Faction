@@ -37,11 +37,11 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  FactionController: {
+  FactionController : {
     '*': ['passport','sessionAuth']
   },
 
-  UserController: {
+  UserController : {
     search                : ['passport', 'sessionAuth'],
     update                : ['passport', 'sessionAuth'],
     addFriend             : ['passport', 'sessionAuth'],
@@ -61,11 +61,16 @@ module.exports.policies = {
     callback              : ['passport', 'notLoggedIn'],
   },
 
-  GroupController: {
+  GroupController : {
     create                : ['passport', 'sessionAuth'],
     addFriend             : ['passport', 'sessionAuth'],
     removeGroup           : ['passport', 'sessionAuth'],
     removeFriendFromGroup : ['passport', 'sessionAuth'],
+  },
+
+  CommentController : {
+    addComment            : ['passport', 'sessionAuth'],
+    enableComment         : ['passport', 'sessionAuth'],
   }
 
 
