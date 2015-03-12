@@ -137,7 +137,6 @@ Request body
 ```javascript
 {
     factionId: "Unique faction ID",
-    username: "Username of the sender of the comment",
     content: "Content of the comment to be posted on the faction."
 }
 ```
@@ -151,7 +150,9 @@ Response body
 }
 ```
 - Error: 400 Bad Request
+    - if any input is not provided
     - invalid faction ID
+    - Comments for the faction are disabled
     - username not part of the faction recipients
     - content is empty (if it only contains spaces, tabs, newlines is also considered empty)
     - content is too big, max length is 1000 characters.
@@ -172,6 +173,7 @@ Request body
 - Success: 200 OK
 Response body
 - Error: 400 Bad Request
+    - factionId not provided
     - invalid faction ID
     - enabled was not sent
     - user is not the owner (sender) of that faction.
@@ -193,9 +195,9 @@ Response body
     friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
-    factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt}
-    factionsSent: [], // (*) an array of {recipients, story, fact, factionId, createdAt}
-    pendingFactions: [], // (*) an array of {sender, story, fact, factionId}
+    factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt, comments}
+    factionsSent: [], // (*) an array of {recipients, story, fact, factionId, createdAt, comments}
+    pendingFactions: [], // (*) an array of {sender, story, fact, factionId, createdAt, comments}
     /* 
         For factionsReceived, factionsSent and pendingFactions
         - sender is a username string
@@ -204,6 +206,7 @@ Response body
         - fact is a boolean
         - factionId is string
         - createdAt is a date
+        - comments is [ { commentId, factionId, commenter, content, createdAt } ]
     */
     factionResponses: [], // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 
@@ -229,13 +232,14 @@ Response body
 {
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
-    pendingFactions: [],        // (*) array of {sender, story, fact, factionId}
+    pendingFactions: [],        // (*) array of {sender, story, fact, factionId, comments}
     /* 
         sender is a username string
         story is a string
         fact is a boolean
         factionId is string
         createdAt is a date
+        comments is [ { commentId, factionId, commenter, content, createdAt } ]
     */
     factionResponses: [],       // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 

@@ -32,6 +32,10 @@ module.exports = {
     },
     story    : { type: 'string' },
     fact     : { type: 'boolean' },
+    commentsEnabled: { 
+        type: 'boolean',
+        defaultsTo: true
+    },
     deletedBy: {
         collection: 'user',
         via: 'deletedFactions',

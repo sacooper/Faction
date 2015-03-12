@@ -24,46 +24,50 @@ module.exports.routes = {
 
   /** AUTH **/
 
-  'get /api/user/login'             : 'AuthController.login',
-  'get /api/user/logout'            : 'AuthController.logout',
-  'post /api/user/logout'           : 'AuthController.logout',
-  'post /api/user/login'            : 'AuthController.callback',
-  'get /api/user/new'               : 'AuthController.register',
-  'post /api/user/new'              : 'AuthController.callback',
+  'get    /api/user/login'               : 'AuthController.login',
+  'get    /api/user/logout'              : 'AuthController.logout',
+  'post   /api/user/logout'              : 'AuthController.logout',
+  'post   /api/user/login'               : 'AuthController.callback',
+  'get    /api/user/new'                 : 'AuthController.register',
+  'post   /api/user/new'                 : 'AuthController.callback',
+    
+  'put    /api/user/update-password'     : 'AuthController.updatePassword',
   
-  'put /api/user/update-password'   : 'AuthController.updatePassword',
+  'post   /api/auth/local'               : 'AuthController.callback',
+  'post   /api/auth/local/:action'       : 'AuthController.callback',
+  
+  'get    /api/auth/:provider'           : 'AuthController.provider',
+  'get    /api/auth/:provider/:action'   : 'AuthController.callback',
+  'get    /api/auth/:provider/callback'  : 'AuthController.callback',
+  
+  /** Faction related routes **/  
+  'post   /api/factions/send'            : 'FactionController.create',
+  'post   /api/factions/respond'         : 'FactionController.respond',
+  'post   /api/factions/delete'          : 'FactionController.deleteFaction',
 
-  'post /api/auth/local'            : 'AuthController.callback',
-  'post /api/auth/local/:action'    : 'AuthController.callback',
-
-  'get /api/auth/:provider'         : 'AuthController.provider',
-  'get /api/auth/:provider/:action' : 'AuthController.callback',
-  'get /api/auth/:provider/callback': 'AuthController.callback',
-
-  /** Faction related routes **/
-  'post /api/factions/send'         : 'FactionController.create',
-  'post /api/factions/respond'      : 'FactionController.respond',
-  'post /api/factions/delete'       : 'FactionController.deleteFaction',
-
-  /** User info flow and update control routes **/
-  'get  /api/user/info'              : 'UserController.getAllInfo',
-  'post /api/user/update'            : 'UserController.update',
-
+  /** Comment related routes **/
+  'post   /api/factions/add-comment'     : 'CommentController.addComment',
+  'put    /api/factions/enable-comment'  : 'CommentController.enableComment',
+ 
+  /** User info flow and update control  routes **/
+  'get    /api/user/info'                : 'UserController.getAllInfo',
+  'post   /api/user/update'              : 'UserController.update',
+ 
   /** Frient request routes **/
-  'post /api/user/request-friend'   : 'UserController.addFriend',
-  'post /api/user/accept-friend'    : 'UserController.acceptFriendRequest',
-  'delete /api/user/delete-friend'  : 'UserController.deleteFriend',
-
-  /** User utilities **/
-  'get /api/user/search'            : 'UserController.search',
-  'get /api/user/friends'           : 'UserController.friends', 
-  'get /api/user/factions'          : 'UserController.factions',
-
-  /** Group related routes **/
-  'post /api/group/create'          : 'GroupController.create',
-  'post /api/group/add-friend'      : 'GroupController.addFriend',
-  'delete /api/group/remove'        : 'GroupController.removeGroup',
-  'delete /api/group/remove-friend' : 'GroupController.removeFriendFromGroup',
+  'post   /api/user/request-friend'      : 'UserController.addFriend',
+  'post   /api/user/accept-friend'       : 'UserController.acceptFriendRequest',
+  'delete /api/user/delete-friend'       : 'UserController.deleteFriend',
+  
+  /** User utilities **/  
+  'get    /api/user/search'              : 'UserController.search',
+  'get    /api/user/friends'             : 'UserController.friends', 
+  'get    /api/user/factions'            : 'UserController.factions',
+  
+  /** Group related routes **/  
+  'post   /api/group/create'             : 'GroupController.create',
+  'post   /api/group/add-friend'         : 'GroupController.addFriend',
+  'delete /api/group/remove'             : 'GroupController.removeGroup',
+  'delete /api/group/remove-friend'      : 'GroupController.removeFriendFromGroup',
 
   
   /***************************************************************************

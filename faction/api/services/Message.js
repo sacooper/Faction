@@ -2,10 +2,14 @@
 
 module.exports = {
 
-	createSuccess: function(message, data) {		
+	createSuccess: function(message, data) {
+		var theData = data;
+		if(!theData) {
+			theData = {}
+		}		
 		return {
 			message: message,
-			data: data
+			data: theData
 		};
 	},
 

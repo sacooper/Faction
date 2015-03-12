@@ -112,6 +112,7 @@ module.exports = {
 		var to = req.param('to');
 		var faction = req.param('faction');
 		var fact = req.param('fact');
+		var commentsEnabled = req.param('commentsEnabled') || true;
 		var recipientIds = [];
 
 		var errFct = function(err) {
@@ -178,7 +179,8 @@ module.exports = {
 					trueResponses: 0,
 					falseResponses: 0,
 					story: faction,
-					fact: fact
+					fact: fact,
+					commentsEnabled: commentsEnabled
 				})
 				.then(function(faction) {
 					res.status(201).send(Message.createSuccess('Successfully sent the faction', {
