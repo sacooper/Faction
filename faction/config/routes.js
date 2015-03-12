@@ -69,7 +69,9 @@ module.exports.routes = {
   'delete /api/group/remove'             : 'GroupController.removeGroup',
   'delete /api/group/remove-friend'      : 'GroupController.removeFriendFromGroup',
 
-  
+  /** Top three friends **/
+  'get /api/user/top-three'         : 'UserController.topThree',
+
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
