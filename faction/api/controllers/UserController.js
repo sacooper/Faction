@@ -144,6 +144,7 @@ module.exports = {
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
+								imageUrl: f.imageUrl, // Optional
 								commentsEnabled: f.commentsEnabled,
 								createdAt: f.createdAt,
 								comments: comments 
@@ -170,6 +171,7 @@ module.exports = {
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story,
+							imageUrl: f.imageUrl, // Optional
 							commentsEnabled: f.commentsEnabled,
 							createdAt: f.createdAt,
 							comments: comments  
@@ -193,6 +195,7 @@ module.exports = {
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
+								imageUrl: f.imageUrl, // Optional
 								commentsEnabled: f.commentsEnabled,
 								createdAt: f.createdAt,
 								comments: comments 
@@ -321,6 +324,7 @@ module.exports = {
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
+								imageUrl: f.imageUrl, // Optional
 								commentsEnabled: f.commentsEnabled,
 								createdAt: f.createdAt,
 								comments: comments  
@@ -690,6 +694,7 @@ module.exports = {
 						sender: faction.sender,
 						story: faction.story,
 						fact: faction.fact,
+						imageUrl: faction.imageUrl, // Optional
 						id: faction.id,
 						commentsEnabled: faction.commentsEnabled,
 						createdAt: faction.createdAt
@@ -703,6 +708,7 @@ module.exports = {
 						sender: faction.sender,
 						story: faction.story,
 						fact: faction.fact,
+						imageUrl: faction.imageUrl, // Optional
 						id: faction.id,
 						commentsEnabled: faction.commentsEnabled,
 						createdAt: faction.createdAt

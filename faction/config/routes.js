@@ -70,7 +70,12 @@ module.exports.routes = {
   'delete /api/group/remove-friend'      : 'GroupController.removeFriendFromGroup',
 
   /** Top three friends **/
-  'get /api/user/top-three'         : 'UserController.topThree',
+  'get /api/user/top-three'              : 'UserController.topThree',
+
+  /** Getting/Posting the image **/
+  'get /images/:factionId/:name'         : 'FactionController.getImage',
+  'post /api/factions/upload-image'      : 'FactionController.uploadImage',
+
 
   /***************************************************************************
   *                                                                          *
@@ -82,9 +87,9 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': {
-    view: 'homepage'
-  },
+  // '/': {
+  //   view: 'homepage'
+  // },
 
 
 
