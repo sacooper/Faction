@@ -66,14 +66,18 @@ module.exports = {
 
 				var factionsReceived = Faction.find({
 						id: _.difference(factionReceivedIds, _.pluck(me.deletedFactions, 'id'))
-					}).populate('sender')
+					})
+					.populate('sender')
+					.populate('comments')
 					.then(function(factionsReceived) {
 						return factionsReceived;
 					});
 
 				var factionsSent = Faction.find().where({
 						id: _.difference(factionSentIds, _.pluck(me.deletedFactions, 'id'))
-					}).populate('sender')
+					})
+					.populate('sender')
+					.populate('comments')
 					.then(function(factionsSent) {
 						return factionsSent;
 					});
@@ -84,6 +88,7 @@ module.exports = {
 					})
 					.populate('sender')
 					.populate('status')
+					.populate('comments')
 					.then(function(pendingFactions) {
 						return pendingFactions;
 					});
@@ -125,16 +130,36 @@ module.exports = {
 					factionsReceived: factionsReceived.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
 						if(friendSender) {
+							var comments = f.comments.map(function(comment) {
+								return {
+									commentId: comment.id,
+									factionId: comment.faction,
+									content: comment.content,
+									commenter: comment.commenter,
+									createdAt: comment.createdAt
+								};
+							});
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
-								createdAt: f.createdAt 
+								commentsEnabled: f.commentsEnabled,
+								createdAt: f.createdAt,
+								comments: comments 
 							};
 						}
 					}).filter(function(f) { return typeof f !== 'undefined'; }),
 					factionsSent: factionsSent.map(function(f){
+						var comments = f.comments.map(function(comment) {
+								return {
+									commentId: comment.id,
+									factionId: comment.faction,
+									content: comment.content,
+									commenter: comment.commenter,
+									createdAt: comment.createdAt
+								};
+							});
 						return {
 							recipients : f.recipients.map(function(r){ 
 								var recipient = _.find(friends, function(friend){ return friend.id == r; });
@@ -145,18 +170,32 @@ module.exports = {
 							factionId: f.id,
 							fact : f.fact,
 							story : f.story,
-							createdAt: f.createdAt }
-						}),
+							commentsEnabled: f.commentsEnabled,
+							createdAt: f.createdAt,
+							comments: comments  
+						}
+					}),
 					pendingFactions: pendingFactions.map(function(f){
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
 						var myPfStatus = _.find(f.status, function(pf) { return pf.recipient === userId }) || {};
 						if(friendSender && !myPfStatus.read && !myPfStatus.answered) {
+							var comments = f.comments.map(function(comment) {
+								return {
+									commentId: comment.id,
+									factionId: comment.faction,
+									content: comment.content,
+									commenter: comment.commenter,
+									createdAt: comment.createdAt
+								};
+							});
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
-								createdAt: f.createdAt 
+								commentsEnabled: f.commentsEnabled,
+								createdAt: f.createdAt,
+								comments: comments 
 							};
 						}
 					}).filter(function(f) { return typeof f !== 'undefined'; }),
@@ -268,12 +307,23 @@ module.exports = {
 						var friendSender = _.find(friends, function(friend){ return friend.id == f.sender.id; });
 						var myPfStatus = _.find(f.status, function(pf) { return pf.recipient === userId }) || {};
 						if(friendSender && !myPfStatus.read && !myPfStatus.answered) {
+							var comments = f.comments.map(function(comment) {
+								return {
+									commentId: comment.id,
+									factionId: comment.faction,
+									content: comment.content,
+									commenter: comment.commenter,
+									createdAt: comment.createdAt
+								};
+							});
 							return {
 								sender : friendSender.username,
 								factionId : f.id,
 								fact : f.fact,
 								story : f.story,
-								createdAt: f.createdAt 
+								commentsEnabled: f.commentsEnabled,
+								createdAt: f.createdAt,
+								comments: comments  
 							};
 						}
 					}).filter(function(f) { return typeof f !== 'undefined'; }),
@@ -640,7 +690,9 @@ module.exports = {
 						sender: faction.sender,
 						story: faction.story,
 						fact: faction.fact,
-						id: faction.id
+						id: faction.id,
+						commentsEnabled: faction.commentsEnabled,
+						createdAt: faction.createdAt
 					}
 				});
 
@@ -651,7 +703,9 @@ module.exports = {
 						sender: faction.sender,
 						story: faction.story,
 						fact: faction.fact,
-						id: faction.id
+						id: faction.id,
+						commentsEnabled: faction.commentsEnabled,
+						createdAt: faction.createdAt
 					}
 				});
 
@@ -714,7 +768,7 @@ module.exports = {
 	},
 
 	topThree: function(req, res){
-		var catchErr = function(err){res.status(500).send(err);};
+		var catchErr = function(err){res.status(500).send(Message.createError(err))};
 
 		User.findOne({id: req.user.id})
 			.populate('friends')

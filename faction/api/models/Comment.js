@@ -14,7 +14,9 @@ module.exports = {
   	commenter   : {
         model: 'user'
     },
-    message: { type: 'string' }
+    content: { 
+    	type: 'string' 
+    }
   }
 };
 
