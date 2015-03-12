@@ -94,6 +94,19 @@ Request body
 - Error: 500 Internal Server Error
     - Error returned
 
+### Associate an Image with a Faction
+#### /api/factions/upload-image (POST)(+)
+Request body: multipart/form-data
+- contains 'image' and 'factionId'
+- Success: 200 OK
+    - data attribute contains confirmation that the image was uploaded
+- Error: 400 Bad request
+    - No image provided
+    - Person posting to the endpoint is not the person who created the faction
+    - An image has already been associated with this faction
+- Error: 500 Internal Server Error
+    - Error returned
+
 ### Sending Response to a Faction
 #### /api/factions/respond (POST)(+)
 Request body
