@@ -768,7 +768,7 @@ module.exports = {
 	},
 
 	topThree: function(req, res){
-		var catchErr = function(err){res.status(500).send(err);};
+		var catchErr = function(err){res.status(500).send(Message.createError(err))};
 
 		User.findOne({id: req.user.id})
 			.populate('friends')
