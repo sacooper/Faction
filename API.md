@@ -208,19 +208,20 @@ Response body
     friends: [], // (*) username strings of all your friends (includes acceptedFriendRequests)
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
-    factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt, comments}
-    factionsSent: [], // (*) an array of {recipients, story, fact, factionId, createdAt, comments}
-    pendingFactions: [], // (*) an array of {sender, story, fact, factionId, createdAt, comments}
+    factionsReceived: [], // (*) array of {sender, story, fact, factionId, createdAt, commentsEnabled, comments, imageUrl (optional)}
+    factionsSent: [], // (*) an array of {recipients, story, fact, factionId, createdAt, commentsEnabled, comments, imageUrl (optional) }
+    pendingFactions: [], // (*) an array of {sender, story, fact, factionId, createdAt, commentsEnabled, comments, imageUrl (optional)}
     /* 
         For factionsReceived, factionsSent and pendingFactions
         - sender is a username string
             - recipients is an array of strings
         - story is a string
         - fact is a boolean
-        - commentsEnabled is a boolean
         - factionId is string
         - createdAt is a date
+        - commentsEnabled is a boolean
         - comments is [ { commentId, factionId, commenter, content, createdAt } ]
+        - imageUrl is a string
     */
     factionResponses: [], // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 
@@ -246,7 +247,7 @@ Response body
 {
     receivedFriendRequests: [], // (*) username strings (they are awaiting an answer from you)
     acceptedFriendRequests: [], // (1) username strings (they are your new friends)
-    pendingFactions: [],        // (*) array of {sender, story, fact, factionId, comments}
+    pendingFactions: [],        // (*) array of {sender, story, fact, factionId, createdAt, commentsEnabled, comments, imageUrl (optional)}
     /* 
         sender is a username string
         story is a string
@@ -254,7 +255,9 @@ Response body
         factionId is string
         commentsEnabled is a boolean
         createdAt is a date
+        commentsEnabled
         comments is [ { commentId, factionId, commenter, content, createdAt } ]
+        imageUrl is a string
     */
     factionResponses: [],       // (1) an array of {factionId, responderUsername, response} that are responses to your sent factions
     /* 
@@ -352,8 +355,8 @@ Request body
 #### /api/user/factions (GET)(+)
 - Success: 200 OK
     - data attribute of body contains JSON object {sent: [], received: []}
-        - sent is an array of {sender: username string,story,fact,id, commentsEnabled, createdAt}
-        - received is an array of {sender: your user id,story,fact,id, commentsEnabled, createdAt}
+        - sent is an array of {sender: username string,story,fact,id, commentsEnabled, createdAt, imageUrl (optional)}
+        - received is an array of {sender: your user id,story,fact,id, commentsEnabled, createdAt, imageUrl (optional)}
 - Error: 500 Internal Server Error
     - error returned
 
