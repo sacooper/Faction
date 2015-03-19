@@ -112,7 +112,10 @@ module.exports = {
 		var to = req.param('to');
 		var faction = req.param('faction');
 		var fact = req.param('fact');
-		var commentsEnabled = req.param('commentsEnabled') || true;		
+		var commentsEnabled = req.param('commentsEnabled');
+		if (_.isUndefined(commentsEnabled))	{
+			commentsEnabled = true;
+		}	
 		var recipientIds = [];
 
 		var errFct = function(err) {
