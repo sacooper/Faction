@@ -53,7 +53,12 @@ module.exports = {
 					faction.comments.add(comment.id);
 					faction.save()
 					.then(function(f) {
-						res.status(201).send(Message.createSuccess('Successfully posted a comment', { commentId: comment.id }));
+						res.status(201).send(Message.createSuccess('Successfully posted a comment', 
+							{ 
+								commentId: comment.id,
+								createdAt: comment.createdAt; 
+							}
+						));
 					})
 					.catch(function(err) {
 						res.status(500).send(Message.createError(err));
