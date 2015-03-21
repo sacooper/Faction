@@ -56,7 +56,7 @@ module.exports = {
 						res.status(201).send(Message.createSuccess('Successfully posted a comment', 
 							{ 
 								commentId: comment.id,
-								createdAt: comment.createdAt; 
+								createdAt: comment.createdAt
 							}
 						));
 					})
