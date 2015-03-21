@@ -50,6 +50,8 @@ module.exports = {
 				// Array of friends
 				var friends = me.friends;
 
+				var allUsers = User.find().then(function(u) {return u;});
+
 				var pendingUsers = User.find({
 						id: pendingReceivedRequestsIds,
 						createdAt: { '>': lastUpdate}
@@ -107,12 +109,20 @@ module.exports = {
 
 				return [friends, pendingUsers, newFriends, 
 							factionsReceived, factionsSent, pendingFactions,
-							responses, updateTimestamp, me, groups];
+							responses, updateTimestamp, me, groups, allUsers];
 
 			})
 			.spread(function(friends, pendingUsers, newFriends, 
 								factionsReceived, factionsSent, pendingFactions,
-								responses, updateTimestamp, me, groups) {
+								responses, updateTimestamp, me, groups, allUsers) {
+
+				var users = {};
+
+				allUsers.forEach(function(user) {
+					users[user.id] = user.username;
+				});
+
+				console.log(users);
 
 				res.status(200).send({
 					groups: groups.map(function(grp){
@@ -135,7 +145,7 @@ module.exports = {
 									commentId: comment.id,
 									factionId: comment.faction,
 									content: comment.content,
-									commenter: comment.commenter,
+									commenter: users[comment.commenter],
 									createdAt: comment.createdAt
 								};
 							});
@@ -157,7 +167,7 @@ module.exports = {
 									commentId: comment.id,
 									factionId: comment.faction,
 									content: comment.content,
-									commenter: comment.commenter,
+									commenter: users[comment.commenter],
 									createdAt: comment.createdAt
 								};
 							});
@@ -186,7 +196,7 @@ module.exports = {
 									commentId: comment.id,
 									factionId: comment.faction,
 									content: comment.content,
-									commenter: comment.commenter,
+									commenter: users[comment.commenter],
 									createdAt: comment.createdAt
 								};
 							});
@@ -262,6 +272,8 @@ module.exports = {
 				// Ids of the pending factions
 				var factionIds = me.pendingFactions.map(function(f){ return f.faction; });
 
+				var allUsers = User.find().then(function(u) {return u;});
+
 				var pendingUsers = User.find({
 						id: pendingReceivedRequestsIds,
 						createdAt: { '>': lastUpdate}
@@ -297,11 +309,18 @@ module.exports = {
 
 				var updateTimestamp = new Date();
 
-				return [me.friends, pendingUsers, newFriends, pendingFactions, responses, updateTimestamp, updatedUser, updatedPendingFactions, me];
+				return [me.friends, pendingUsers, newFriends, pendingFactions, responses, 
+					updateTimestamp, updatedUser, updatedPendingFactions, me, allUsers];
 
 			})
 			.spread(function(friends, pendingUsers, newFriends, pendingFactions,
-								responses, updateTimestamp, updatedUser, updatedPendingFactions, me) {
+								responses, updateTimestamp, updatedUser, updatedPendingFactions, me, allUsers) {
+
+				var users = {};
+
+				allUsers.forEach(function(user) {
+					users[user.id] = user.username;
+				});
 
 				res.status(200).send({
 					receivedFriendRequests: _.pluck(pendingUsers, 'username'),
@@ -315,7 +334,7 @@ module.exports = {
 									commentId: comment.id,
 									factionId: comment.faction,
 									content: comment.content,
-									commenter: comment.commenter,
+									commenter: users[comment.commenter],
 									createdAt: comment.createdAt
 								};
 							});
